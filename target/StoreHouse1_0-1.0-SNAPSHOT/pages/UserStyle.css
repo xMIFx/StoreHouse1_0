@@ -1,0 +1,49 @@
+body {
+    padding: 0px;
+    margin: 0px;
+    font-family: Arial;
+}
+a{
+    text-decoration: none;
+}
+div.autoriz{
+ position: absolute;
+    top:30%;
+    left: 50%;
+    margin-left: -150px;
+    padding: 30px 30px 20px 30px;
+    -webkit-box-shadow: 1px 2px 5px 1px rgba(1,1,1,0.5);
+    box-shadow: 1px 2px 5px 1px rgba(1,1,1,0.5);
+    background: #D5D5E8;
+}
+div.autoriz input{
+    margin: 0px;
+    padding: 5px 10px;
+    border: 0px;
+
+    font-size: 14px;
+    outline: none;
+    margin-bottom: 10px;
+
+}
+input.login,input.password{
+    -webkit-box-shadow:inset -2px -3px 5px 1px rgba(1,1,1,0.2);
+    box-shadow:inset -2px -3px 5px 1px rgba(1,1,1,0.2);
+    display: block;
+}
+input.button1{
+    background: #7db9e8;
+    color: #ccc;
+}
+div.box{
+    white-space: nowrap;
+}
+div.box a,div.box input{
+   display: inline-block;*zoom:1;
+    vertical-align: middle;
+    margin: 5px 10px;
+}
+div.box a{
+    color: #000;
+
+}

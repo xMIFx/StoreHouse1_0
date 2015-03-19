@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+      http://www.springframework.org/schema/aop
+      http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
+
+
+    <bean id="poolDataSource" class="com.jolbox.bonecp.BoneCPDataSource" destroy-method="close">
+        <property name="driverClass" value="com.mysql.jdbc.Driver"/>
+        <property name="jdbcUrl" value="jdbc:mysql://127.0.0.1:3306/storehouse"/>
+        <property name="username" value="root"/>
+        <property name="password" value="Lytghj12"/>
+        <property name="maxConnectionsPerPartition" value="30"/>
+        <property name="minConnectionsPerPartition" value="10"/>
+        <property name="partitionCount" value="3"/>
+        <property name="acquireIncrement" value="5"/>
+        <property name="statementsCacheSize" value="100"/>
+    </bean>
+    <bean id="txManager" class="com.gist.github.xMIFx.StoreHouse.SQLPack.ImplSQL.TransactionManagerImpl"
+          scope="singleton">
+        <property name="dataSourcePool" ref="poolDataSource"/>
+    </bean>
+    <bean id="userDao" class="com.gist.github.xMIFx.StoreHouse.dao.Impl.UserDaoJdbc" scope="singleton">
+        <property name="dataSource" ref="txManager"/>
+    </bean>
+
+    <bean id="userInterface" class="com.gist.github.xMIFx.StoreHouse.dao.Impl.InterfaceMenuDaoJdbc" scope="singleton">
+        <property name="dataSource" ref="txManager"/>
+    </bean>
+
+
+</beans>
