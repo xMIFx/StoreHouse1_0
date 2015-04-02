@@ -17,7 +17,7 @@ public class MessengerSocket {
         try {
             if (session.isOpen()) {
                 session.getBasicRemote().sendText(msg, true);
-                System.out.println(msg);
+
             }
         } catch (IOException e) {
             try {

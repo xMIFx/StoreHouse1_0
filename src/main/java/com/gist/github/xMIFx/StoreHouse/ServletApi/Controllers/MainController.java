@@ -21,7 +21,7 @@ import java.sql.SQLException;
 /**
  * Created by Vlad on 07.03.2015.
  */
-@WebServlet("/")
+@WebServlet("/index.do")
 public class MainController extends DependenceInjectionServlet {
     private static final String COOKIE_NAME = "user";
     private static final String ATTRIBUTE_MENU_TO_VIEW = "menuList";

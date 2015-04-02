@@ -6,12 +6,14 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<script src="/jsFiles/SendMessages.js"></script>
+
 <html>
 
 <head>
     <title></title>
+   <script src="${pageContext.request.contextPath}/jsFiles/sendMessages.js"></script>
 </head>
+
 <body>
 <meta charset="utf-8">
 <title>Your First WebSocket!</title>

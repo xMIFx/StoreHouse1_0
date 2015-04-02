@@ -1,13 +1,8 @@
 /**
  * Created by bukatinvv on 02.04.2015.
  */
-var wsUri = "ws://localhost:8080/chat";
-
-function init() {
-    output = document.getElementById("output");
-}
+var wsUri = "ws://localhost:8081/chat";
 function send_message() {
-    writeToScreen("sss");
     websocket = new WebSocket(wsUri);
     websocket.onopen = function(evt) {
         onOpen(evt)
@@ -19,6 +14,10 @@ function send_message() {
         onError(evt)
     };
 }
+function init() {
+    output = document.getElementById("output");
+}
+
 function onOpen(evt) {
     writeToScreen("Connected to Endpoint!");
     doSend(textID.value);
