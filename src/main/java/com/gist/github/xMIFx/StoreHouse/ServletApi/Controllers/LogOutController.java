@@ -13,7 +13,7 @@ import java.io.IOException;
 /**
  * Created by Vlad on 13.03.2015.
  */
-@WebServlet("/logOut.do")
+@WebServlet("/exit.do")
 public class LogOutController extends DependenceInjectionServlet {
     private static final String COOKIE_USER = "user";
     private static final String PAGE_OK = "/";

@@ -17,9 +17,9 @@
 </c:if>
 <c:if test="${user.uuid != user.getEmptyUUID()}">
     <p>${user.name}</p>
-    <a href="logOut.do" class="txt">logOut</a>
+    <a href="exit.do" class="txt">logOut</a>
 </c:if>
-
+<a href="pages/messenger.jsp" class="txt">messages</a></div>
 <ul>
     <c:forEach var="menu" items="${menuList}">
 

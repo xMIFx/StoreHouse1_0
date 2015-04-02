@@ -17,7 +17,7 @@
     <input type="text" class="login" placeholder="login" name="login"/>
     <input type="password" class="password" placeholder="password" name="password"/>
     <div class="box"><input type="submit" value="ok" class="button1"/>
-    <a href="#" class="txt">write to admin</a></div>
+
 </div>
 </form>
 
