@@ -19,7 +19,7 @@
     <p>${user.name}</p>
     <a href="exit.do" class="txt">logOut</a>
 </c:if>
-<a href="pages/messenger.jsp" class="txt">messages</a></div>
+<a href="messenger.do" class="txt">messages</a></div>
 <ul>
     <c:forEach var="menu" items="${menuList}">
 
