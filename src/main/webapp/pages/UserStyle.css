@@ -47,3 +47,99 @@ div.box a{
     color: #000;
 
 }
+div.user_box,div.output_box{
+    display: inline-block;
+    vertical-align: top;
+}
+
+div.center{
+    width: 980px;
+    padding: 20px 10px;
+    margin: 0px auto auto;
+
+}
+div.user_box{
+    width: 250px;
+}
+div.output_box{
+    width: 580px;
+}
+
+ul li{
+    list-style: none;
+}
+div.group a.gr{
+    font-size: 16px;
+    font-weight: 700;
+    color: #000;
+}
+div.group a{
+    margin-bottom: 9px;
+    display: block;
+}
+
+div.group ul{
+    padding: 0px;
+}
+div.group ul li{
+    padding: 4px 0px;
+}
+div.group ul li a:hover{
+    text-decoration: underline;
+}
+div.group ul li.offline a{
+    font-size: 14px;
+    font-weight: 300;
+    color: #666;
+    padding:0px 10px;
+}
+
+div.group ul li.online a{
+    font-size: 14px;
+    font-weight: 300;
+    color: #000;
+    padding:0px 10px;
+}
+div.group ul li a span{
+    width: 8px;
+    height: 8px;
+    border-radius: 10px;
+    display: inline-block;
+    vertical-align: middle;
+    margin: -4px 7px 0px 7px;
+}
+div.group ul li.online a{
+    vertical-align: middle;
+}
+div.group ul li.online a span{
+    background: green;
+}
+div.group ul li.offline a span{
+    background: gray;
+}
+
+ul.none{
+    display: none;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
