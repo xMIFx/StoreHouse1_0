@@ -1,22 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="BookmarkManager">
-    <bookmark url="file://$PROJECT_DIR$/src/main/webapp/pages/UserStyle.css" line="100" />
+    <bookmark url="file://$PROJECT_DIR$/src/main/webapp/pages/UserStyle.css" line="101" />
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3e99bae4-d8ff-4135-97f2-eb5f6686235b" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/webapp/jsFiles/showHideFunction.js" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/webapp/images/expand_minus.gif" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/webapp/images/expand_plus.gif" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/StoreHouse1_0-1.0-SNAPSHOT.war" afterPath="$PROJECT_DIR$/target/StoreHouse1_0-1.0-SNAPSHOT.war" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/gist/github/xMIFx/StoreHouse/ServletApi/Listeners/LoginListener.java" afterPath="$PROJECT_DIR$/src/main/java/com/gist/github/xMIFx/StoreHouse/ServletApi/Listeners/LoginListener.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/MANIFEST.MF" afterPath="$PROJECT_DIR$/target/MANIFEST.MF" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/StoreHouse1_0-1.0-SNAPSHOT/META-INF/MANIFEST.MF" afterPath="$PROJECT_DIR$/target/StoreHouse1_0-1.0-SNAPSHOT/META-INF/MANIFEST.MF" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/webapp/pages/UserStyle.css" afterPath="$PROJECT_DIR$/src/main/webapp/pages/UserStyle.css" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/StoreHouse1_0-1.0-SNAPSHOT/pages/UserStyle.css" afterPath="$PROJECT_DIR$/target/StoreHouse1_0-1.0-SNAPSHOT/pages/UserStyle.css" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/webapp/pages/login.jsp" afterPath="$PROJECT_DIR$/src/main/webapp/pages/login.jsp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/StoreHouse1_0-1.0-SNAPSHOT/pages/login.jsp" afterPath="$PROJECT_DIR$/target/StoreHouse1_0-1.0-SNAPSHOT/pages/login.jsp" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/webapp/pages/messenger.jsp" afterPath="$PROJECT_DIR$/src/main/webapp/pages/messenger.jsp" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/StoreHouse1_0-1.0-SNAPSHOT/pages/messenger.jsp" afterPath="$PROJECT_DIR$/target/StoreHouse1_0-1.0-SNAPSHOT/pages/messenger.jsp" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/maven-archiver/pom.properties" afterPath="$PROJECT_DIR$/target/maven-archiver/pom.properties" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/webapp/jsFiles/showHideFunction.js" afterPath="$PROJECT_DIR$/src/main/webapp/jsFiles/showHideFunction.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/StoreHouse1_0-1.0-SNAPSHOT/jsFiles/showHideFunction.js" afterPath="$PROJECT_DIR$/target/StoreHouse1_0-1.0-SNAPSHOT/jsFiles/showHideFunction.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="StoreHouse1_0.iws" />
@@ -49,8 +47,8 @@
       <file leaf-file-name="messenger.jsp" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/webapp/pages/messenger.jsp">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-9.153846" vertical-offset="255" max-vertical-offset="1037">
-              <caret line="29" column="17" selection-start-line="29" selection-start-column="17" selection-end-line="29" selection-end-column="17" />
+            <state vertical-scroll-proportion="-4.576923" vertical-offset="255" max-vertical-offset="1054">
+              <caret line="22" column="14" selection-start-line="22" selection-start-column="14" selection-end-line="22" selection-end-column="14" />
               <folding />
             </state>
           </provider>
@@ -59,8 +57,8 @@
       <file leaf-file-name="showHideFunction.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/webapp/jsFiles/showHideFunction.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.09375" vertical-offset="0" max-vertical-offset="1326">
-              <caret line="5" column="3" selection-start-line="5" selection-start-column="3" selection-end-line="5" selection-end-column="3" />
+            <state vertical-scroll-proportion="0.40625" vertical-offset="816" max-vertical-offset="1394">
+              <caret line="63" column="0" selection-start-line="63" selection-start-column="0" selection-end-line="63" selection-end-column="0" />
               <folding>
                 <element signature="n#!!doc;n#functionShowHide#0" expanded="false" />
               </folding>
@@ -71,8 +69,8 @@
       <file leaf-file-name="UserStyle.css" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/webapp/pages/UserStyle.css">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="930" max-vertical-offset="2567">
-              <caret line="76" column="4" selection-start-line="76" selection-start-column="4" selection-end-line="76" selection-end-column="4" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="1776" max-vertical-offset="2771">
+              <caret line="120" column="0" selection-start-line="120" selection-start-column="0" selection-end-line="120" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -130,8 +128,8 @@
         <option value="$PROJECT_DIR$/src/main/java/com/gist/github/xMIFx/StoreHouse/ServletApi/Controllers/MessengerController.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/gist/github/xMIFx/StoreHouse/ServletApi/Listeners/LoginListener.java" />
         <option value="$PROJECT_DIR$/src/main/webapp/pages/login.jsp" />
-        <option value="$PROJECT_DIR$/src/main/webapp/pages/UserStyle.css" />
         <option value="$PROJECT_DIR$/src/main/webapp/pages/messenger.jsp" />
+        <option value="$PROJECT_DIR$/src/main/webapp/pages/UserStyle.css" />
         <option value="$PROJECT_DIR$/src/main/webapp/jsFiles/showHideFunction.js" />
       </list>
     </option>
@@ -319,11 +317,37 @@
               <option name="myItemId" value="main" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webapp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="images" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="StoreHouse1_0" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="StoreHouse1_0" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scope" />
       <pane id="PackagesPane" />
+      <pane id="Scope" />
       <pane id="Scratches" />
     </panes>
   </component>
@@ -362,6 +386,7 @@
       <recent name="D:\java\mav\StoreHouse1_0\src\main\resources" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\java\mav\StoreHouse1_0\src\main\webapp\images" />
       <recent name="D:\java\mav\StoreHouse1_0\src\main\webapp\jsFiles" />
       <recent name="D:\java\mav\StoreHouse1_0\src\main\webapp\pages" />
     </key>
@@ -773,11 +798,12 @@
       <workItem from="1428067736859" duration="35000" />
       <workItem from="1428092171451" duration="3600000" />
       <workItem from="1428178797723" duration="3305000" />
+      <workItem from="1428265816391" duration="2827000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="110900000" />
+    <option name="totallyTimeSpent" value="113727000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1456" height="876" extended-state="6" />
@@ -842,13 +868,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/gist/github/xMIFx/StoreHouse/Entity/Interfaces/Directory.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="0">
-          <caret line="17" column="21" selection-start-line="17" selection-start-column="21" selection-end-line="17" selection-end-column="21" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/gist/github/xMIFx/StoreHouse/Entity/Directories/User.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="0">
@@ -1180,26 +1199,31 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/webapp/images/expand_minus.gif">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/webapp/pages/UserStyle.css">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1134" max-vertical-offset="2567">
-          <caret line="76" column="4" selection-start-line="76" selection-start-column="4" selection-end-line="76" selection-end-column="4" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="1776" max-vertical-offset="2771">
+          <caret line="120" column="0" selection-start-line="120" selection-start-column="0" selection-end-line="120" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/webapp/pages/messenger.jsp">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-9.153846" vertical-offset="255" max-vertical-offset="1037">
-          <caret line="29" column="17" selection-start-line="29" selection-start-column="17" selection-end-line="29" selection-end-column="17" />
+        <state vertical-scroll-proportion="-4.576923" vertical-offset="255" max-vertical-offset="1054">
+          <caret line="22" column="14" selection-start-line="22" selection-start-column="14" selection-end-line="22" selection-end-column="14" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/webapp/jsFiles/showHideFunction.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.09375" vertical-offset="0" max-vertical-offset="1326">
-          <caret line="5" column="3" selection-start-line="5" selection-start-column="3" selection-end-line="5" selection-end-column="3" />
+        <state vertical-scroll-proportion="0.40625" vertical-offset="816" max-vertical-offset="1394">
+          <caret line="63" column="0" selection-start-line="63" selection-start-column="0" selection-end-line="63" selection-end-column="0" />
           <folding>
             <element signature="n#!!doc;n#functionShowHide#0" expanded="false" />
           </folding>

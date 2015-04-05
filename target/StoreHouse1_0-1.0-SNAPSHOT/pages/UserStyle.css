@@ -75,7 +75,8 @@ div.group a.gr{
 }
 div.group a{
     margin-bottom: 9px;
-    display: block;
+    display: inline-block;
+    vertical-align: middle;
 }
 
 div.group ul{
@@ -120,6 +121,17 @@ div.group ul li.offline a span{
 
 ul.none{
     display: none;
+}
+div.open{
+    background: url("../images/expand_minus.gif")no-repeat;
+    width: 18px;
+    height: 18px;
+    display: inline-block;
+    vertical-align: middle;
+    margin-top: -7px;
+}
+div.open.closed{
+    background: url("../images/expand_plus.gif")no-repeat;
 }
 
 

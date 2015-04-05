@@ -2,8 +2,10 @@
  * Created by Vlad on 04.04.2015.
  */
 
-function functionShowHide(){
-    toggle(document.getElementById("1"));
+function functionShowHide(mId) {
+    var obj = document.getElementById(mId);
+    toggle(obj);
+
 }
 
 function getRealDisplay(elem) {
@@ -22,6 +24,7 @@ function hide(el) {
     }
 
     el.style.display = "none"
+    el.parentNode.childNodes.item(1).classList.add("closed");
 }
 
 displayCache = {}
@@ -66,6 +69,7 @@ function show(el) {
         el.setAttribute('displayOld', display)
         el.style.display = display
     }
+    el.parentNode.childNodes.item(1).classList.remove("closed");
 }
 
 
