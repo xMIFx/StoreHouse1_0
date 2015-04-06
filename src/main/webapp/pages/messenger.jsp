@@ -21,9 +21,7 @@
 <div class="center">
     <div class="user_box">
          <div class="group">
-            <div class="open"></div>
-            <%-- <a href="#" onclick="functionShowHide('1')" class="gr">group 1</a>--%>
-             <a href="#" onclick="functionAnimatedShowHide('1')" class="gr">group 1</a>
+            <div class="open"></div><a href="#" onclick="functionAnimatedShowHide('1')" class="gr">group 1</a>
             <ul id="1" class = "groups">
                 <li class="online"><a href=""><span></span>Name1</a></li>
                 <li class="online"><a href=""><span></span>Name2</a></li>

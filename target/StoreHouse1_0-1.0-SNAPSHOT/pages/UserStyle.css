@@ -135,8 +135,8 @@ div.open.closed{
 ul.groups {
     opacity: 1;
     filter: alpha(opacity=100);
-    -webkit-transform: translateX(0);
-    transform: translateX(0);
+   /* -webkit-transform: translateY(0);
+    transform: translateY(0);*/
     -webkit-transition: all 0.5s ease-in-out;
     transition: all 0.5s ease-in-out;
 }
@@ -144,8 +144,8 @@ ul.groups.hide {
     visibility: hidden;
     opacity: 0;
     filter: alpha(opacity=0);
-    -webkit-transform: translateX(100%);
-    transform: translateX(100%);
+    webkit-transform: translateY(-100%) scale(0);
+      transform:translateY(-100%)  scaleY(0);
  }
 
 
