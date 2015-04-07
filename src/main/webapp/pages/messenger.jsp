@@ -30,8 +30,8 @@
             </ul>
         </div>
         <div class="group">
-            <a href="#" class="gr">group 2</a>
-            <ul>
+            <div class="open"></div><a href="javascript:" class = "gr" onclick="functionAnimatedShowHide('2')">group 2</a>
+            <ul id="2" class = "slide-down">
                 <li class="offline"><a href=""><span></span>Name4</a></li>
                 <li class="online"><a href=""><span></span>Name5</a></li>
                 <li class="offline"><a href=""><span></span>Name6</a></li>
