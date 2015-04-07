@@ -1,23 +1,30 @@
 /**
  * Created by Vlad on 04.04.2015.
  */
-function functionAnimatedShowHide(mId) {
-    var obj = document.getElementById(mId);
-    var handler = function () {
-        hide(obj);
-        obj.removeEventListener('webkitTransitionEnd', handler, false);
-    };
 
-    if (isHidden(obj)) {
-        show(obj);
-        obj.classList.remove("hide");
+function functionAnimatedShowHide(mID) {
+    var hidden_el = document.getElementById(mID),
+        remove_class = "slide-down",
+        add_class = "slide-up",
+        is_showing= hidden_el.classList.contains(remove_class);
+    /*element_classes = (" " + hidden_el.className + " ").replace(/[\n\t\r]/g, " "),
+     is_showing = element_classes.indexOf(" " + remove_class + " ") > -1;*/
+
+    if (!is_showing) {
+        // Switch variable values
+       // remove_class = [add_class, add_class = remove_class][0];
+        hidden_el.classList.add(remove_class);
+        hidden_el.classList.remove(add_class);
+        hidden_el.parentNode.childNodes[1].classList.remove("closed");
     }
     else {
-        obj.addEventListener('webkitTransitionEnd', handler, false);
-        obj.classList.add("hide");
-
+        hidden_el.classList.add(add_class);
+        hidden_el.classList.remove(remove_class);
+        hidden_el.parentNode.childNodes[1].classList.add("closed");
     }
 
+    // Remove the previous class (if present) and add the new class
+    //hidden_el.className = (element_classes.replace(" " + remove_class + " ", "") + " " + add_class + " ").trim();
 
 }
 
@@ -44,7 +51,6 @@ function hide(el) {
     }
 
     el.style.display = "none";
-    el.parentNode.childNodes.item(1).classList.add("closed");
 }
 
 displayCache = {};
@@ -89,7 +95,6 @@ function show(el) {
         el.setAttribute('displayOld', display);
         el.style.display = display;
     }
-    el.parentNode.childNodes.item(1).classList.remove("closed");
 }
 
 

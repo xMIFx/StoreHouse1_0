@@ -22,7 +22,7 @@
     <div class="user_box">
          <div class="group">
             <div class="open"></div><a href="#" onclick="functionAnimatedShowHide('1')" class="gr">group 1</a>
-            <ul id="1" class = "groups">
+            <ul id="1" class = "slide-down">
                 <li class="online"><a href=""><span></span>Name1</a></li>
                 <li class="online"><a href=""><span></span>Name2</a></li>
                 <li class="offline"><a href=""><span></span>Name3</a></li>
