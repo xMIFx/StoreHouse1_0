@@ -16,7 +16,7 @@
 <div class="autoriz">
     <input type="text" class="login" placeholder="login" name="login"/>
     <input type="password" class="password" placeholder="password" name="password"/>
-    <div class="box"><input type="submit" value="ok" class="button1"/>
+    <div class="box"><input type="submit" value="ok" class="button1"/></div>
 
 </div>
 </form>

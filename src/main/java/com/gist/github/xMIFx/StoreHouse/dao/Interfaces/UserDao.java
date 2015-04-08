@@ -10,7 +10,7 @@ import java.util.List;
  * Created by Vlad on 17.02.2015.
  */
 public interface UserDao extends AllObject {
-    List<User> selectAll();
+    List<User> selectAll() throws SQLException;
 
     User selectById(int id);
 

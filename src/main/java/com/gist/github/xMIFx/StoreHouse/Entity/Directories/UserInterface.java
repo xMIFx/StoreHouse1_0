@@ -33,4 +33,20 @@ public class UserInterface {
         this.name = name;
         this.menuList = menuList;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        UserInterface that = (UserInterface) o;
+
+        return iD == that.iD;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return iD;
+    }
 }

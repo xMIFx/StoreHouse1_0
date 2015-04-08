@@ -43,4 +43,20 @@ public class MenuButton {
         this.name = name;
         this.action = action;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        MenuButton that = (MenuButton) o;
+
+        return iD == that.iD;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return iD;
+    }
 }

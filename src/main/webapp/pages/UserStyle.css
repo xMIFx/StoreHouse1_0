@@ -126,7 +126,7 @@ div.open{
     height: 18px;
     display: inline-block;
     vertical-align: middle;
-    margin-top: -7px;
+    margin-top: -12px;
 }
 div.open.closed{
     background: url("../images/expand_plus.gif")no-repeat;

@@ -16,7 +16,7 @@ import java.io.IOException;
 @WebServlet("/exit.do")
 public class LogOutController extends DependenceInjectionServlet {
     private static final String COOKIE_USER = "user";
-    private static final String PAGE_OK = "/";
+    private static final String PAGE_OK = "/index.do";
     private static final String PAGE_ERROR = "pages/errorPage.jsp";
 
     @Override

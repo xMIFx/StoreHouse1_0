@@ -8,14 +8,15 @@ public class UserRoles {
     public int iD;
     public String name;
     public Boolean fullRole;
-    public Boolean consumeVisible;
 
-    public UserRoles(int iD, String name, Boolean fullRole, Boolean consumeVisible) {
+
+    public UserRoles(int iD, String name, Boolean fullRole) {
         this.iD = iD;
         this.name = name;
         this.fullRole = fullRole;
-        this.consumeVisible = consumeVisible;
-    }
+     }
+
+
 
     public void setName(String name) {
         this.name = name;
@@ -25,9 +26,6 @@ public class UserRoles {
         this.fullRole = fullRole;
     }
 
-    public void setConsumeVisible(Boolean consumeVisible) {
-        this.consumeVisible = consumeVisible;
-    }
 
     public String getName() {
 
@@ -38,9 +36,6 @@ public class UserRoles {
         return fullRole;
     }
 
-    public Boolean getConsumeVisible() {
-        return consumeVisible;
-    }
 
     public int getiD() {
         return iD;
@@ -50,5 +45,19 @@ public class UserRoles {
         this.iD = iD;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
+        UserRoles userRoles = (UserRoles) o;
+
+        return iD == userRoles.iD;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return iD;
+    }
 }

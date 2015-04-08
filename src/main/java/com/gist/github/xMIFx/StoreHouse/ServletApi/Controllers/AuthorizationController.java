@@ -27,7 +27,7 @@ public class AuthorizationController extends DependenceInjectionServlet {
     private static final String LOGIN = "login";
     private static final String PASSWORD = "password";
     private static final String PAGE_OK_FIRST = "pages/login.jsp";
-    private static final String PAGE_OK_LOGIN = "/";
+    private static final String PAGE_OK_LOGIN = "/index.do";
     private static final String PAGE_ERROR = "pages/errorPage.jsp";
     @Inject("txManager")
     private TransactionManager txManager;

@@ -3,7 +3,6 @@ package com.gist.github.xMIFx.StoreHouse.Entity.Directories;
 import com.gist.github.xMIFx.StoreHouse.Entity.Interfaces.Directory;
 
 import java.util.Date;
-import java.util.UUID;
 
 /**
  * Created by Vlad on 17.02.2015.
@@ -17,7 +16,8 @@ public class User extends Directory{
     public String email;
     public String telephone;
     public Date birthDay;
-
+    public boolean consumeVisible;
+    public MessengerGroup messengerGroup;
 
     public User(String login, String password,  String name) {
         super(Directory.createGuid());
@@ -62,6 +62,28 @@ public class User extends Directory{
         this.birthDay = birthDay;
         this.telephone = telephone;
         this.userInterface = userInterface;
+    }
+    public User(String uuid, int id, boolean markdel, String login,String password, String name, String email, UserInterface userInterface,UserRoles role, String telephone, Date birthDay, boolean consumeVisible) {
+        super(uuid, id, markdel);
+        this.password = password;
+        this.login = login;
+        this.name = name;
+        this.email = email;
+        this.role = role;
+        this.birthDay = birthDay;
+        this.telephone = telephone;
+        this.userInterface = userInterface;
+        this.consumeVisible = consumeVisible;
+    }
+    public User(String uuid, int id, boolean markdel, String login,String password, String name, String email, String telephone, Date birthDay, boolean consumeVisible) {
+        super(uuid, id, markdel);
+        this.password = password;
+        this.login = login;
+        this.name = name;
+        this.email = email;
+        this.birthDay = birthDay;
+        this.telephone = telephone;
+        this.consumeVisible = consumeVisible;
     }
 
     public void setEmail(String email) {
@@ -112,6 +134,21 @@ public class User extends Directory{
         return telephone;
     }
 
+    public boolean isConsumeVisible() {
+        return consumeVisible;
+    }
+
+    public void setConsumeVisible(boolean consumeVisible) {
+        this.consumeVisible = consumeVisible;
+    }
+
+    public MessengerGroup getMessengerGroup() {
+        return messengerGroup;
+    }
+
+    public void setMessengerGroup(MessengerGroup messengerGroup) {
+        this.messengerGroup = messengerGroup;
+    }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
