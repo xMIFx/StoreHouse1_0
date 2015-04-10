@@ -23,7 +23,7 @@ import java.util.Map;
  */
 @WebServlet("/messenger.do")
 public class MessengerController extends DependenceInjectionServlet {
-
+    private static final String COOKIE_NAME = "user";
     private static final String ATTRIBUTE_GROUPS_TO_VIEW = "groupMap";
     private static final String PAGE_OK = "pages/messenger.jsp";
     private static final String PAGE_ERROR = "pages/errorPage.jsp";
@@ -36,22 +36,30 @@ public class MessengerController extends DependenceInjectionServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
+            User currentUser = (User) req.getSession().getAttribute(COOKIE_NAME);
             List<User> userList;
             Map<MessengerGroup, List<User>> groupMap = new HashMap<>();
             userList = txManager.doInTransaction(() -> userDao.selectAll());
-            if(userList == null){
-                System.out.println("null");
-            /*NOP*/}
+            if (userList == null) {/*NOP*/}
             else {
-            for (User user : userList) {
-                if (groupMap.containsKey(user.getMessengerGroup())) {
-                    groupMap.get(user.getMessengerGroup()).add(user);
-                } else {
-                    ArrayList<User> ar = new ArrayList<>();
-                    ar.add(user);
-                    groupMap.put(user.getMessengerGroup(), ar);
+                for (User user : userList) {
+                    if (user.equals(currentUser) || user.getUuid().equals(User.getEmptyUUID())) {
+                        continue;
+                    }
+                    /*If current user is consume he can see only some people*/
+                    if ((currentUser.getUuid().equals(User.getEmptyUUID()) || currentUser.getRole().getiD() == 2)
+                            && !user.isConsumeVisible()) {
+                        continue;
+                    }
+
+                    if (groupMap.containsKey(user.getMessengerGroup())) {
+                        groupMap.get(user.getMessengerGroup()).add(user);
+                    } else {
+                        ArrayList<User> ar = new ArrayList<>();
+                        ar.add(user);
+                        groupMap.put(user.getMessengerGroup(), ar);
+                    }
                 }
-            }
             }
             req.setAttribute(ATTRIBUTE_GROUPS_TO_VIEW, groupMap);
             req.getRequestDispatcher(PAGE_OK).forward(req, resp);
