@@ -39,11 +39,16 @@ public class MessengerController extends DependenceInjectionServlet {
             User currentUser = (User) req.getSession().getAttribute(COOKIE_NAME);
             List<User> userList;
             Map<MessengerGroup, List<User>> groupMap = new HashMap<>();
-            userList = txManager.doInTransaction(() -> userDao.selectAll());
-            if (userList == null) {/*NOP*/}
-            else {
+            if (UserDao.getAllUser().isEmpty()) {
+                userList = txManager.doInTransaction(() -> userDao.selectAll());
+            } else {
+                userList = new ArrayList<>();
+                userList.addAll(UserDao.getAllUser().values());
+                System.out.println("YEP");
+            }
+            if (userList == null) {/*NOP*/} else {
                 for (User user : userList) {
-                    if (user.equals(currentUser) || user.getUuid().equals(User.getEmptyUUID())) {
+                    if (user.equals(currentUser) || user.getUuid().equals(User.getEmptyUUID()) || user.markForDelete) {
                         continue;
                     }
                     /*If current user is consume he can see only some people*/

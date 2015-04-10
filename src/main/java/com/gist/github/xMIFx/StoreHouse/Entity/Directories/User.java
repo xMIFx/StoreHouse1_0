@@ -18,6 +18,9 @@ public class User extends Directory{
     public Date birthDay;
     public boolean consumeVisible;
     public MessengerGroup messengerGroup;
+    public boolean online;
+
+
 
     public User(String login, String password,  String name) {
         super(Directory.createGuid());
@@ -148,6 +151,14 @@ public class User extends Directory{
 
     public void setMessengerGroup(MessengerGroup messengerGroup) {
         this.messengerGroup = messengerGroup;
+    }
+
+    public boolean isOnline() {
+        return online;
+    }
+
+    public void setOnline(boolean online) {
+        this.online = online;
     }
     @Override
     public boolean equals(Object o) {
