@@ -26,6 +26,7 @@ public class MainFilter implements Filter {
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest req = (HttpServletRequest) servletRequest;
         HttpServletResponse resp = (HttpServletResponse) servletResponse;
+        req.getSession().setMaxInactiveInterval(900);//15 min
         Cookie cookieFromClient = null;
         Cookie[] cookies = req.getCookies();
         if (cookies != null) {

@@ -44,7 +44,6 @@ public class MessengerController extends DependenceInjectionServlet {
             } else {
                 userList = new ArrayList<>();
                 userList.addAll(UserDao.getAllUser().values());
-                System.out.println("YEP");
             }
             if (userList == null) {/*NOP*/} else {
                 for (User user : userList) {

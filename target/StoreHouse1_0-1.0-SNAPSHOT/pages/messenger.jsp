@@ -27,7 +27,7 @@
                 <div class="open"></div><a href="javascript:" class="gr" onclick="functionAnimatedShowHide('${entry.key.ID}')">${entry.key.name}</a>
                 <ul id="${entry.key.ID}" class="slide-down">
                     <c:forEach var="user" items="${entry.value}">
-                     <li class="online"><a href=""><span></span>${user.name}</a></li>
+                          <li class=${user.online?"online":"offline"}><a href=""><span></span>${user.name}</a></li>
                     </c:forEach>
                 </ul>
             </div>

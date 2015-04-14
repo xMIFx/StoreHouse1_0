@@ -47,6 +47,8 @@ public class AuthorizationController extends DependenceInjectionServlet {
         String enteredPassword = req.getParameter(PASSWORD);
         try {
             User user = txManager.doInTransaction(() -> userDao.selectByLoginPassword(enteredUserName, enteredPassword));
+            user = UserDao.getAllUser().get(user.getUuid());
+            user.setOnline(true);
             Cookie userCookie = new Cookie(COOKIE_NAME, user.getUuid());
             userCookie.setMaxAge(3600);
             resp.addCookie(userCookie);

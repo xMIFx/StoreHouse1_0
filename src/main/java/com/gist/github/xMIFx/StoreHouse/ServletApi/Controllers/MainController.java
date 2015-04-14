@@ -11,10 +11,7 @@ import com.gist.github.xMIFx.StoreHouse.dao.Interfaces.UserDao;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.*;
 import java.io.IOException;
 import java.sql.SQLException;
 
@@ -71,6 +68,7 @@ public class MainController extends DependenceInjectionServlet {
             }
         }
         if (user != null) {
+            UserDao.getAllUser().get(user.getUuid()).setOnline(true); // mark online
             req.setAttribute(ATTRIBUTE_MENU_TO_VIEW, user.getUserInterface().getMenuList());
             req.getRequestDispatcher(PAGE_OK).forward(req, resp);
         }
