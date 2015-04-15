@@ -15,7 +15,7 @@ public class ApplicationContextHolder {
     private ApplicationContextHolder() {
     }
 
-    static final ApplicationContext getClassPathXmlApplicationContext(String path) {
+     static final ApplicationContext getClassPathXmlApplicationContext(String path) {
         if (!pathApplicationContext.containsKey(path)) {
             pathApplicationContext.put(path, new ClassPathXmlApplicationContext(path));
         }

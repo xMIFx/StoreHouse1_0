@@ -56,19 +56,21 @@ public class MainController extends DependenceInjectionServlet {
                 if(UserDao.getAllUser().isEmpty()){userDao.setAllUser();}
                 if (cookieFromClientFinal != null) {
                     user = UserDao.getAllUser().get(cookieFromClientFinal.getValue());
-                    /*user = txManager.doInTransaction(() -> userDao.selectByUUID(cookieFromClientFinal.getValue()));*/
+
+                           /*user = txManager.doInTransaction(() -> userDao.selectByUUID(cookieFromClientFinal.getValue()));*/
                 } else {
                     /*user = txManager.doInTransaction(() -> userDao.createSimpleUser());*/
                     user = UserDao.getAllUser().get(User.getEmptyUUID());
                 }
-                req.getSession(true).setAttribute(COOKIE_NAME, user);
+                user.setOnline(true); // mark online
+                req.getSession().setAttribute(COOKIE_NAME, user);
             } catch (SQLException e) {
                 e.printStackTrace();
                 resp.sendRedirect(PAGE_ERROR);
             }
         }
         if (user != null) {
-            UserDao.getAllUser().get(user.getUuid()).setOnline(true); // mark online
+            /*UserDao.getAllUser().get(user.getUuid()).setOnline(true); // mark online*/
             req.setAttribute(ATTRIBUTE_MENU_TO_VIEW, user.getUserInterface().getMenuList());
             req.getRequestDispatcher(PAGE_OK).forward(req, resp);
         }

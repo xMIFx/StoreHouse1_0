@@ -28,7 +28,7 @@ public interface UserDao extends AllObject {
 
     List<User> selectByName(String name);
 
-    void setAllUser() throws SQLException;
+     void setAllUser() throws SQLException;
 
     static Map<String, User> getAllUser() {
         return allUser;

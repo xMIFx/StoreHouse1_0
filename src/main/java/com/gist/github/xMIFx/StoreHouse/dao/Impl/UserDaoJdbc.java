@@ -533,6 +533,5 @@ public class UserDaoJdbc implements UserDao {
 
             allUser.putAll(userMap);
         }
-
     }
 }
