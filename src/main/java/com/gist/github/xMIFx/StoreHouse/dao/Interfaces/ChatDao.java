@@ -9,9 +9,8 @@ import java.util.List;
  * Created by bukatinvv on 16.04.2015.
  */
 public interface ChatDao {
-    int saveChat(Chats chat);
+    int saveNewChat(Chats chat);
     Chats getChatByID(int chatID);
     List<Messages> getAllMessagesByChat(int ID);
     List<Messages> getLastMessagesByChat(int ID);
-
 }

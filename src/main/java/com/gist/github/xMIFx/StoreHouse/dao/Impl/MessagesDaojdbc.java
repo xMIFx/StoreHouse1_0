@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Created by bukatinvv on 16.04.2015.
  */
-public class MessagesDaojdbc implements MessageDao {
+public class MessagesDaoJdbc implements MessageDao {
     private DataSource dataSource;
 
     public void setDataSource(DataSource dataSource) {
