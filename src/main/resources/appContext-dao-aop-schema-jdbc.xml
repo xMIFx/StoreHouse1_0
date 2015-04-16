@@ -29,6 +29,9 @@
     <bean id="userInterface" class="com.gist.github.xMIFx.StoreHouse.dao.Impl.InterfaceMenuDaoJdbc" scope="singleton">
         <property name="dataSource" ref="txManager"/>
     </bean>
+    <bean id="messagesDao" class="com.gist.github.xMIFx.StoreHouse.dao.Impl.MessagesDaojdbc" scope="singleton">
+        <property name="dataSource" ref="txManager"/>
+    </bean>
 
 
 </beans>
