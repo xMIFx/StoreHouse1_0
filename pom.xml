@@ -37,7 +37,6 @@
                     <compilerArgument></compilerArgument>
                 </configuration>
             </plugin>
-
         </plugins>
     </build>
     <dependencies>
