@@ -80,8 +80,7 @@ public class MainFilter extends DependenceInjectionServlet implements Filter {
                     user = UserDao.getAllUser().get(User.getEmptyUUID());
                 }
                 req.getSession().setAttribute(COOKIE_NAME, user);
-
-            } catch (SQLException e) {
+                } catch (SQLException e) {
                 e.printStackTrace();
                 ex = true;
 

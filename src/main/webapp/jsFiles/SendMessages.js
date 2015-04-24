@@ -3,6 +3,7 @@
  */
 var wsUri = "ws://" + document.location.host + document.location.pathname + "/chat";
 websocket = new WebSocket(wsUri);
+
 websocket.onopen = function (evt) {
     onOpen(evt)
 };
