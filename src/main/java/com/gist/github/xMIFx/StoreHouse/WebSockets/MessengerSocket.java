@@ -10,7 +10,7 @@ import javax.websocket.OnMessage;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
-@ServerEndpoint("/chat")
+@ServerEndpoint("/messenger.do/chat")
 public class MessengerSocket {
     @OnMessage
     public void echoTextMessage(Session session, String msg) {

@@ -1,18 +1,21 @@
 /**
  * Created by bukatinvv on 02.04.2015.
  */
-var wsUri = "ws://localhost:8081/chat";
+var wsUri = "ws://" + document.location.host + document.location.pathname + "/chat";
+websocket = new WebSocket(wsUri);
+websocket.onopen = function (evt) {
+    onOpen(evt)
+};
+websocket.onmessage = function (evt) {
+    onMessage(evt)
+};
+websocket.onerror = function (evt) {
+    onError(evt)
+};
+
 function send_message() {
-    websocket = new WebSocket(wsUri);
-    websocket.onopen = function(evt) {
-        onOpen(evt)
-    };
-    websocket.onmessage = function(evt) {
-        onMessage(evt)
-    };
-    websocket.onerror = function(evt) {
-        onError(evt)
-    };
+
+    doSend(textID.value);
 }
 function init() {
     output = document.getElementById("output");
@@ -20,7 +23,7 @@ function init() {
 
 function onOpen(evt) {
     writeToScreen("Connected to Endpoint!");
-    doSend(textID.value);
+    // doSend(textID.value);
 }
 function onMessage(evt) {
     writeToScreen("Message Received: " + evt.data);
@@ -38,4 +41,5 @@ function writeToScreen(message) {
     pre.style.wordWrap = "break-word";
     pre.innerHTML = message;
 
-    output.appendChild(pre);}
+    output.appendChild(pre);
+}

@@ -8,6 +8,7 @@ import java.util.UUID;
 public abstract class Directory {
     public boolean markForDelete = false;
     protected int id;
+
     final String uuid;
 
     public Directory(String uuid) {
@@ -28,6 +29,14 @@ public abstract class Directory {
     public void markToDelete(boolean mark) {
         markForDelete = mark;
 
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     protected static String createGuid() {

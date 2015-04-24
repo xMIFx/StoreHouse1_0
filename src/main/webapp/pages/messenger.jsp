@@ -21,13 +21,17 @@
 <body>
 <div class="center">
     <div class="user_box">
-     <c:forEach var="entry" items="${groupMap}">
+        <c:forEach var="entry" items="${groupMap}">
 
             <div class="group">
-                <div class="open"></div><a href="javascript:" class="gr" onclick="functionAnimatedShowHide('${entry.key.ID}')">${entry.key.name}</a>
+                <div class="open"></div>
+                <a href="javascript:" class="gr"
+                   onclick="functionAnimatedShowHide('${entry.key.ID}')">${entry.key.name}</a>
                 <ul id="${entry.key.ID}" class="slide-down">
-                    <c:forEach var="user" items="${entry.value}">
-                          <li class=${user.online?"online":"offline"}><a href=""><span></span>${user.name}</a></li>
+                    <c:forEach var="chatUser" items="${entry.value}">
+                        <li class=${chatUser.online?"online":"offline"}><a id="chatUser_${chatUser.id}"
+                                                                           href=""><span></span>${chatUser.name}</a>
+                        </li>
                     </c:forEach>
                 </ul>
             </div>
