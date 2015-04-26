@@ -5,16 +5,18 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
       http://www.springframework.org/schema/aop
       http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
-   <bean id="aspect-loggerListener" class="com.gist.github.xMIFx.StoreHouse.aspects.LogInLogOutListeners"/>
 
-    <aop:aspectj-autoproxy/>
+
+ <!--   <aop:aspectj-autoproxy/>-->
+<!--    <bean id="aspect-loggerListener" class="com.gist.github.xMIFx.StoreHouse.Aspects.testAop"/>
     <aop:config>
         <aop:aspect ref="aspect-loggerListener">
             <aop:pointcut id="listenOnline"
-                          expression="execution(* com.gist.github.xMIFx.StoreHouse.Entity.Directories.User.setOnline(boolean ))"/>
+                          expression="execution(* com.gist.github.xMIFx.StoreHouse.Entity.Directories.User.getBirthDay())"/>
              <aop:around pointcut-ref="listenOnline" method="ListenUsersOnline"/>
         </aop:aspect>
-      </aop:config>
+      </aop:config>-->
+
 
     <bean id="poolDataSource" class="com.jolbox.bonecp.BoneCPDataSource" destroy-method="close">
         <property name="driverClass" value="com.mysql.jdbc.Driver"/>

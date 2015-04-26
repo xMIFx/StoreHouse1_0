@@ -7,6 +7,7 @@ import java.util.Date;
 /**
  * Created by Vlad on 17.02.2015.
  */
+
 public class User extends Directory{
     private String password;
     private UserInterface userInterface;
