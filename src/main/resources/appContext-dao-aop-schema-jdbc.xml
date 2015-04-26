@@ -8,7 +8,7 @@
 
 
  <!--   <aop:aspectj-autoproxy/>-->
-<!--    <bean id="aspect-loggerListener" class="com.gist.github.xMIFx.StoreHouse.Aspects.testAop"/>
+<!--    <bean id="aspect-loggerListener" class="com.gist.github.xMIFx.StoreHouse.Aspects."/>
     <aop:config>
         <aop:aspect ref="aspect-loggerListener">
             <aop:pointcut id="listenOnline"
