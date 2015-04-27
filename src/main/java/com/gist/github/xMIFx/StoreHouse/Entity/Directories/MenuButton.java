@@ -6,7 +6,8 @@ package com.gist.github.xMIFx.StoreHouse.Entity.Directories;
 public class MenuButton {
     private int iD;
     private String name;
-    private  String action;
+    private String action;
+    private final String type = "MenuButton"; //for json
 
     public void setiD(int iD) {
         this.iD = iD;
@@ -58,5 +59,15 @@ public class MenuButton {
     @Override
     public int hashCode() {
         return iD;
+    }
+
+    @Override
+    public String toString() {
+        return "MenuButton{" +
+                "iD=" + iD +
+                ", name='" + name + '\'' +
+                ", action='" + action + '\'' +
+                ", type='" + type + '\'' +
+                '}';
     }
 }

@@ -29,8 +29,8 @@
                    onclick="functionAnimatedShowHide('${entry.key.ID}')">${entry.key.name}</a>
                 <ul id="${entry.key.ID}" class="slide-down">
                     <c:forEach var="chatUser" items="${entry.value}">
-                        <li class=${chatUser.online?"online":"offline"}><a id="chatUser_${chatUser.id}"
-                                                                           href=""><span></span>${chatUser.name}</a>
+                        <li id="chatUser_${chatUser.id}"
+                            class=${chatUser.online?"online":"offline"}><a href=""><span></span>${chatUser.name}</a>
                         </li>
                     </c:forEach>
                 </ul>

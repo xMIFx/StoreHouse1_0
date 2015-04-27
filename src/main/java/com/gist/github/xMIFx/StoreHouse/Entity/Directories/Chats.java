@@ -9,6 +9,7 @@ public class Chats {
     private int idChat;
     private List<String> userUUIDList;
     private List<Messages> messagesList;
+    private final String type = "Chat"; //for json
 
     public int getIdChat() {
         return idChat;
@@ -48,5 +49,15 @@ public class Chats {
     @Override
     public int hashCode() {
         return idChat;
+    }
+
+    @Override
+    public String toString() {
+        return "Chats{" +
+                "idChat=" + idChat +
+                ", userUUIDList=" + userUUIDList +
+                ", messagesList=" + messagesList +
+                ", type=" + type +
+                '}';
     }
 }

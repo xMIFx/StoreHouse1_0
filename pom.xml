@@ -8,6 +8,12 @@
     <artifactId>StoreHouse1_0</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>war</packaging>
+    <!--<repositories>
+        <repository>
+            <id>codehaus</id>
+            <url>http://repository.codehaus.org/org/codehaus</url>
+        </repository>
+    </repositories>-->
 
     <properties>
         <jdc.version>1.8</jdc.version>
@@ -95,12 +101,12 @@
             <version>${spring.version}</version>
             <scope>compile</scope>
         </dependency>
-       <!-- <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-aop</artifactId>
-            <version>${spring.version}</version>
-            <scope>compile</scope>
-        </dependency>-->
+        <!-- <dependency>
+             <groupId>org.springframework</groupId>
+             <artifactId>spring-aop</artifactId>
+             <version>${spring.version}</version>
+             <scope>compile</scope>
+         </dependency>-->
 
         <!--<dependency>
             <groupId>org.aspectj</groupId>
@@ -150,8 +156,16 @@
             <version>1.1</version>
             <scope>provided</scope>
         </dependency>
-
-
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-core-asl</artifactId>
+            <version>1.6.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-mapper-asl</artifactId>
+            <version>1.6.0</version>
+        </dependency>
 
 
     </dependencies>

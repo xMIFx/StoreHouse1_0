@@ -11,6 +11,7 @@ public class InterfaceMenu {
     private int iD;
     private String name;
     private List<MenuButton> buttonList;
+    private final String type = "InterfaceMenu"; //for json
 
     public void setButtonList(List<MenuButton> buttonList) {
         this.buttonList = buttonList;
@@ -57,5 +58,15 @@ public class InterfaceMenu {
     @Override
     public int hashCode() {
         return iD;
+    }
+
+    @Override
+    public String toString() {
+        return "InterfaceMenu{" +
+                "iD=" + iD +
+                ", name='" + name + '\'' +
+                ", buttonList=" + buttonList +
+                ", type=" + type +
+                '}';
     }
 }

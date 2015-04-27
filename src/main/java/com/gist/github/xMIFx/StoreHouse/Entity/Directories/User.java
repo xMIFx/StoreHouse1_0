@@ -8,7 +8,7 @@ import java.util.Date;
  * Created by Vlad on 17.02.2015.
  */
 
-public class User extends Directory{
+public class User extends Directory {
     private String password;
     private UserInterface userInterface;
     private UserRoles role;
@@ -20,16 +20,17 @@ public class User extends Directory{
     public boolean consumeVisible;
     public MessengerGroup messengerGroup;
     public boolean online;
+    private final String type = "User"; //for json
 
 
-
-    public User(String login, String password,  String name) {
+    public User(String login, String password, String name) {
         super(Directory.createGuid());
         this.password = password;
         this.login = login;
         this.name = name;
-        }
-    public User(String login,String password, String name, String email) {
+    }
+
+    public User(String login, String password, String name, String email) {
         super(Directory.createGuid());
         this.password = password;
         this.login = login;
@@ -38,7 +39,8 @@ public class User extends Directory{
 
 
     }
-    public User(String uuid, int id, boolean markdel, String login,String password, String name, String email) {
+
+    public User(String uuid, int id, boolean markdel, String login, String password, String name, String email) {
         super(uuid, id, markdel);
         this.password = password;
         this.login = login;
@@ -47,7 +49,8 @@ public class User extends Directory{
 
 
     }
-    public User(String uuid, int id, boolean markdel, String login,String password, String name, String email, String telephone, Date birthDay) {
+
+    public User(String uuid, int id, boolean markdel, String login, String password, String name, String email, String telephone, Date birthDay) {
         super(uuid, id, markdel);
         this.password = password;
         this.login = login;
@@ -56,7 +59,8 @@ public class User extends Directory{
         this.telephone = telephone;
         this.birthDay = birthDay;
     }
-    public User(String uuid, int id, boolean markdel, String login,String password, String name, String email, UserInterface userInterface,UserRoles role, String telephone, Date birthDay) {
+
+    public User(String uuid, int id, boolean markdel, String login, String password, String name, String email, UserInterface userInterface, UserRoles role, String telephone, Date birthDay) {
         super(uuid, id, markdel);
         this.password = password;
         this.login = login;
@@ -67,7 +71,8 @@ public class User extends Directory{
         this.telephone = telephone;
         this.userInterface = userInterface;
     }
-    public User(String uuid, int id, boolean markdel, String login,String password, String name, String email, UserInterface userInterface,UserRoles role, String telephone, Date birthDay, boolean consumeVisible) {
+
+    public User(String uuid, int id, boolean markdel, String login, String password, String name, String email, UserInterface userInterface, UserRoles role, String telephone, Date birthDay, boolean consumeVisible) {
         super(uuid, id, markdel);
         this.password = password;
         this.login = login;
@@ -79,7 +84,8 @@ public class User extends Directory{
         this.userInterface = userInterface;
         this.consumeVisible = consumeVisible;
     }
-    public User(String uuid, int id, boolean markdel, String login,String password, String name, String email, String telephone, Date birthDay, boolean consumeVisible) {
+
+    public User(String uuid, int id, boolean markdel, String login, String password, String name, String email, String telephone, Date birthDay, boolean consumeVisible) {
         super(uuid, id, markdel);
         this.password = password;
         this.login = login;
@@ -161,6 +167,7 @@ public class User extends Directory{
     public void setOnline(boolean online) {
         this.online = online;
     }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -173,10 +180,32 @@ public class User extends Directory{
 
         return true;
     }
+
     @Override
     public int hashCode() {
         int result = password != null ? password.hashCode() : 0;
         result = 31 * result + (login != null ? login.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id='" + id + '\'' +
+                "markForDelete='" + markForDelete + '\'' +
+                "uuid='" + this.getUuid() + '\'' +
+                "password='" + password + '\'' +
+                ", login='" + login + '\'' +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", telephone='" + telephone + '\'' +
+                ", birthDay=" + birthDay +
+                ", consumeVisible=" + consumeVisible +
+                ", online=" + online +
+                ", userInterface=" + userInterface +
+                ", role=" + role +
+                ", messengerGroup=" + messengerGroup +
+                ", type=" + type +
+                '}';
     }
 }

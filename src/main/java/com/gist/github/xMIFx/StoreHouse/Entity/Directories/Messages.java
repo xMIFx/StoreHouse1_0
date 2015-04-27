@@ -11,6 +11,7 @@ public class Messages {
     private String message;
     private boolean currentUserMessage;
     private boolean newMessage;
+    private final String type = "Messages"; //for json
 
     public Messages(String userFromUUID, int chatID, String message, boolean newMessage) {
         this.userFromUUID = userFromUUID;
@@ -79,5 +80,17 @@ public class Messages {
         result = 31 * result + chatID;
         result = 31 * result + (message != null ? message.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "Messages{" +
+                "userFromUUID='" + userFromUUID + '\'' +
+                ", chatID=" + chatID +
+                ", message='" + message + '\'' +
+                ", currentUserMessage=" + currentUserMessage +
+                ", newMessage=" + newMessage +
+                ", type=" + type +
+                '}';
     }
 }

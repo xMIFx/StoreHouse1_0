@@ -9,11 +9,13 @@ public class MessengerGroup {
 
     public int ID;
     public String name;
+    private final String type = "MessengerGroup"; //for json
 
     public MessengerGroup(int id, String name) {
         this.ID = id;
         this.name = name;
     }
+
     public String getName() {
         return name;
     }
@@ -29,6 +31,7 @@ public class MessengerGroup {
     public void setID(int ID) {
         this.ID = ID;
     }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -48,4 +51,12 @@ public class MessengerGroup {
         return result;
     }
 
+    @Override
+    public String toString() {
+        return "MessengerGroup{" +
+                "ID=" + ID +
+                ", name='" + name + '\'' +
+                ", type='" + type + '\'' +
+                '}';
+    }
 }

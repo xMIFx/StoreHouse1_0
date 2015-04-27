@@ -11,6 +11,7 @@ public class UserInterface {
     private int iD;
     private String name;
     private List<InterfaceMenu> menuList;
+    private final String type = "UserInterface"; //for json
 
     public UserInterface(int iD, String name) {
         this.iD = iD;
@@ -48,5 +49,15 @@ public class UserInterface {
     @Override
     public int hashCode() {
         return iD;
+    }
+
+    @Override
+    public String toString() {
+        return "UserInterface{" +
+                "iD=" + iD +
+                ", name='" + name + '\'' +
+                ", menuList=" + menuList +
+                ", type=" + type +
+                '}';
     }
 }

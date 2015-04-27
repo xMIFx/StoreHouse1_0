@@ -27,7 +27,8 @@ function onOpen(evt) {
     // doSend(textID.value);
 }
 function onMessage(evt) {
-    writeToScreen("Message Received: " + evt.data);
+
+    parseJsonStr(evt.data);
 }
 function onError(evt) {
     writeToScreen('ERROR: ' + evt.data);
@@ -37,10 +38,39 @@ function doSend(message) {
     websocket.send(message);
     //websocket.close();
 }
+function parseJsonStr(str) {
+    var json = JSON.parse(str);
+    if (json.type == "User") {
+        changeOnlineStatus(json);
+    }
+    else if (json.type == "Messages") {
+        writeMessageFromJson(json);
+    }
+}
 function writeToScreen(message) {
     var pre = document.createElement("p");
     pre.style.wordWrap = "break-word";
     pre.innerHTML = message;
 
     output.appendChild(pre);
+}
+
+function changeOnlineStatus(json) {
+    var idForChange = "chatUser_" + json.id;
+    if (json.online) {
+        if (document.getElementById(idForChange).classList.contains("offline")) {
+            document.getElementById(idForChange).classList.remove("offline");
+        }
+        document.getElementById(idForChange).classList.add("online");
+    }
+    else {
+        if (document.getElementById(idForChange).classList.contains("online")) {
+            document.getElementById(idForChange).classList.remove("online");
+        }
+        document.getElementById(idForChange).classList.add("offline");
+    }
+}
+
+function writeMessageFromJson(json) {
+    writeToScreen("Message Received: " + json.message);
 }

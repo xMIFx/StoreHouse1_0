@@ -8,14 +8,14 @@ public class UserRoles {
     public int iD;
     public String name;
     public Boolean fullRole;
+    private final String type = "UserRoles"; //for json
 
 
     public UserRoles(int iD, String name, Boolean fullRole) {
         this.iD = iD;
         this.name = name;
         this.fullRole = fullRole;
-     }
-
+    }
 
 
     public void setName(String name) {
@@ -59,5 +59,15 @@ public class UserRoles {
     @Override
     public int hashCode() {
         return iD;
+    }
+
+    @Override
+    public String toString() {
+        return "UserRoles{" +
+                "iD=" + iD +
+                ", name='" + name + '\'' +
+                ", fullRole=" + fullRole +
+                ", type=" + type +
+                '}';
     }
 }
