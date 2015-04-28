@@ -40,19 +40,28 @@ public class MessengerController extends DependenceInjectionServlet {
             List<User> userList;
             Map<MessengerGroup, List<User>> groupMap = new HashMap<>();
             if (UserDao.getAllUser().isEmpty()) {
+                //After userDao.selectAll() UserDao.getAllUser() isn't empty
                 userList = txManager.doInTransaction(() -> userDao.selectAll());
             } else {
                 userList = new ArrayList<>();
                 userList.addAll(UserDao.getAllUser().values());
             }
+            //if user not registered, he can't send messages. Redirect on page with question/answer in future!!!
             if (userList == null) {/*NOP*/} else {
                 for (User user : userList) {
                     if (user.equals(currentUser) || user.getUuid().equals(User.getEmptyUUID()) || user.markForDelete) {
                         continue;
                     }
-                    /*If current user is consume he can see only some people*/
-                    if ((currentUser.getUuid().equals(User.getEmptyUUID()) || currentUser.getRole().getiD() == 2)
+                    /*If current user is consume he can see only some people
+                    * User.getEmptyUUID()).getRole().getiD() - it's role of consume*/
+                    if ((currentUser.getUuid().equals(User.getEmptyUUID()) ||
+                            currentUser.getRole().getiD() == UserDao.getAllUser().get(User.getEmptyUUID()).getRole().getiD())
                             && !user.isConsumeVisible()) {
+                        continue;
+                    }
+                    // Only user with consumeVisible = true can see consumers
+                    if (!currentUser.isConsumeVisible() &&
+                            user.getRole().getiD() == UserDao.getAllUser().get(User.getEmptyUUID()).getRole().getiD()) {
                         continue;
                     }
 
