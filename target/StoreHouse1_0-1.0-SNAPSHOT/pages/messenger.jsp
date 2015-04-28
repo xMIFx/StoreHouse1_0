@@ -29,8 +29,10 @@
                    onclick="functionAnimatedShowHide('${entry.key.ID}')">${entry.key.name}</a>
                 <ul id="${entry.key.ID}" class="slide-down">
                     <c:forEach var="chatUser" items="${entry.value}">
-                        <li id="chatUser_${chatUser.id}"
-                            class=${chatUser.online?"online":"offline"}><a href=""><span></span>${chatUser.name}</a>
+                        <li id="user_${chatUser.id}"
+                            class=${chatUser.online?"online":"offline"}><a href="javascript:"
+                                                                           onclick="functionChangingChat('${chatUser.xorUuid}')">
+                            <span></span>${chatUser.name}</a>
                         </li>
                     </c:forEach>
                 </ul>
@@ -38,7 +40,7 @@
         </c:forEach>
 
     </div>
-    <div class="output_box">
+    <div id = "output_box" class="output_box">
         <h1 style="text-align: center;">Hello World WebSocket Client</h1>
 
         <div style="text-align: center;">
@@ -47,7 +49,7 @@
                 <input id="textID" name="message" value="Hello WebSocket!" type="text">
             </form>
         </div>
-        <div id="output"></div>
+        <div id="chatUser_0"></div>
     </div>
 </div>
 </body>

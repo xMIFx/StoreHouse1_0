@@ -13,4 +13,5 @@ public interface ChatDao {
     Chats getChatByID(int chatID);
     List<Messages> getAllMessagesByChat(int ID);
     List<Messages> getLastMessagesByChat(int ID);
+    Chats getChatBetweenUsers(String user1,String user2);
 }

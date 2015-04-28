@@ -37,4 +37,9 @@ public class ChatDaoJdbc implements ChatDao {
         return null;
     }
 
+    @Override
+    public Chats getChatBetweenUsers(String user1, String user2) {
+        return null;
+    }
+
 }

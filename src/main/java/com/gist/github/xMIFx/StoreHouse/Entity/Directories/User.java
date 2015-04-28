@@ -21,10 +21,13 @@ public class User extends Directory {
     public MessengerGroup messengerGroup;
     public boolean online;
     private final String type = "User"; //for json
+    private final String kForXor = "IKnowNothing";
+    private final String xorUuid; //for web so we need change some simbols
 
 
     public User(String login, String password, String name) {
         super(Directory.createGuid());
+        this.xorUuid = Directory.getXorUUID(this.getUuid(),this.kForXor);
         this.password = password;
         this.login = login;
         this.name = name;
@@ -32,6 +35,7 @@ public class User extends Directory {
 
     public User(String login, String password, String name, String email) {
         super(Directory.createGuid());
+        this.xorUuid = Directory.getXorUUID(this.getUuid(),this.kForXor);
         this.password = password;
         this.login = login;
         this.name = name;
@@ -42,6 +46,7 @@ public class User extends Directory {
 
     public User(String uuid, int id, boolean markdel, String login, String password, String name, String email) {
         super(uuid, id, markdel);
+        this.xorUuid = Directory.getXorUUID(this.getUuid(),this.kForXor);
         this.password = password;
         this.login = login;
         this.name = name;
@@ -52,6 +57,7 @@ public class User extends Directory {
 
     public User(String uuid, int id, boolean markdel, String login, String password, String name, String email, String telephone, Date birthDay) {
         super(uuid, id, markdel);
+        this.xorUuid = Directory.getXorUUID(this.getUuid(),this.kForXor);
         this.password = password;
         this.login = login;
         this.name = name;
@@ -62,6 +68,7 @@ public class User extends Directory {
 
     public User(String uuid, int id, boolean markdel, String login, String password, String name, String email, UserInterface userInterface, UserRoles role, String telephone, Date birthDay) {
         super(uuid, id, markdel);
+        this.xorUuid = Directory.getXorUUID(this.getUuid(),this.kForXor);
         this.password = password;
         this.login = login;
         this.name = name;
@@ -74,6 +81,7 @@ public class User extends Directory {
 
     public User(String uuid, int id, boolean markdel, String login, String password, String name, String email, UserInterface userInterface, UserRoles role, String telephone, Date birthDay, boolean consumeVisible) {
         super(uuid, id, markdel);
+        this.xorUuid = Directory.getXorUUID(this.getUuid(),this.kForXor);
         this.password = password;
         this.login = login;
         this.name = name;
@@ -83,10 +91,11 @@ public class User extends Directory {
         this.telephone = telephone;
         this.userInterface = userInterface;
         this.consumeVisible = consumeVisible;
-    }
+     }
 
     public User(String uuid, int id, boolean markdel, String login, String password, String name, String email, String telephone, Date birthDay, boolean consumeVisible) {
         super(uuid, id, markdel);
+        this.xorUuid = Directory.getXorUUID(this.getUuid(),this.kForXor);
         this.password = password;
         this.login = login;
         this.name = name;
@@ -142,6 +151,15 @@ public class User extends Directory {
 
     public String getTelephone() {
         return telephone;
+    }
+
+    public String getXorUuid() {
+        return xorUuid;
+    }
+
+    public String getkForXor() {
+
+        return kForXor;
     }
 
     public boolean isConsumeVisible() {
