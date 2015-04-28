@@ -1,8 +1,0 @@
-<aspectj>
-    <weaver options="">
-        <include within="com.gist.github.xMIFx.StoreHouse.Entity..*"/>
-    </weaver>
-    <aspects>
-        <aspect name="com.gist.github.xMIFx.StoreHouse.Aspects.UserLogInLogOutListener" />
-    </aspects>
-</aspectj>

@@ -3,11 +3,6 @@
     <output-path>$PROJECT_DIR$/target</output-path>
     <root id="archive" name="StoreHouse1_0-1.0-SNAPSHOT.war">
       <element id="artifact" artifact-name="StoreHouse1_0:war exploded" />
-      <element id="directory" name="WEB-INF">
-        <element id="directory" name="lib">
-          <element id="library" level="project" name="aspectjrt" />
-        </element>
-      </element>
     </root>
   </artifact>
 </component>

@@ -1,6 +1,6 @@
 package com.gist.github.xMIFx.StoreHouse.Entity.Interfaces;
 
-import com.sun.deploy.net.HttpUtils;
+import com.gist.github.xMIFx.StoreHouse.Entity.StringCrypter;
 
 import java.util.UUID;
 
@@ -10,8 +10,8 @@ import java.util.UUID;
 public abstract class Directory {
     public boolean markForDelete = false;
     protected int id;
-
     final String uuid;
+
 
     public Directory(String uuid) {
         this.uuid = uuid;
