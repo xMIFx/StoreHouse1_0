@@ -31,7 +31,7 @@
                     <c:forEach var="chatUser" items="${entry.value}">
                         <li id="user_${chatUser.id}"
                             class=${chatUser.online?"online":"offline"}><a href="javascript:"
-                                                                           onclick="functionChangingChat('${chatUser.xorUuid}')">
+                                                                           onclick="functionChangingChat('${chatUser.cryptUUID}')">
                             <span></span>${chatUser.name}</a>
                         </li>
                     </c:forEach>

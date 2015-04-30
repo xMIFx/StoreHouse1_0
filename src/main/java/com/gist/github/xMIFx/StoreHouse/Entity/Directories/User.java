@@ -1,8 +1,9 @@
 package com.gist.github.xMIFx.StoreHouse.Entity.Directories;
 
 import com.gist.github.xMIFx.StoreHouse.Entity.Interfaces.Directory;
-import com.gist.github.xMIFx.StoreHouse.Entity.StringCrypter;
-import com.gist.github.xMIFx.StoreHouse.Entity.StringCrypter.DESSecretKey;
+import com.gist.github.xMIFx.StoreHouse.Entity.OtherHelpingEntity.Crypting.AesException;
+import com.gist.github.xMIFx.StoreHouse.Entity.OtherHelpingEntity.Crypting.StringCrypter;
+import com.google.common.html.HtmlEscapers;
 
 import java.util.Date;
 
@@ -25,8 +26,7 @@ public class User extends Directory {
     private final String type = "User"; //for json
     private static final String keyForCrypt = "IKnowNothing";
     private final static StringCrypter crypter = new StringCrypter(keyForCrypt.getBytes());
-    private String cryptUUID;
-
+    private String cryptUUID; //need escape html symbols
 
     public User(String login, String password, String name) {
         super(Directory.createGuid());
@@ -149,6 +149,18 @@ public class User extends Directory {
         return telephone;
     }
 
+    public String getCryptUUID() {
+        if (cryptUUID == null) {
+            try {
+                cryptUUID = HtmlEscapers.htmlEscaper().escape(crypter.encrypt(this.getUuid()));
+            } catch (AesException e) {
+                cryptUUID = HtmlEscapers.htmlEscaper().escape(this.getUuid());
+                e.printStackTrace();
+            }
+        }
+        return cryptUUID;
+    }
+
     public boolean isConsumeVisible() {
         return consumeVisible;
     }
@@ -171,6 +183,13 @@ public class User extends Directory {
 
     public void setOnline(boolean online) {
         this.online = online;
+    }
+
+    public static String decryptUUID(String cryptStr) throws AesException {
+        String result = null;
+        result = crypter.decrypt(cryptStr);
+        return result;
+
     }
 
     @Override

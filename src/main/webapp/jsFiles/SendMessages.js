@@ -62,6 +62,7 @@ function doSend(message) {
     //websocket.close();
 }
 
+
 function parseJsonStr(str) {
     var json = JSON.parse(str);
     if (json.type == "User") {
@@ -70,18 +71,13 @@ function parseJsonStr(str) {
     else if (json.type == "Messages") {
         writeMessageFromJson(json);
     }
-}
 
-function writeToScreen(message) {
-    if (output === undefined) {
-        setOutput();
+    else if (json.type == "Exception") {
+        writeAboutException(json.value);
     }
-    var pre = document.createElement("p");
-    pre.style.wordWrap = "break-word";
-    pre.innerHTML = message;
-
-    output.appendChild(pre);
+    else{ writeMessageFromJson(json);}
 }
+
 
 function changeOnlineStatus(json) {
     var idForChange = "user_" + json.id;
@@ -103,6 +99,25 @@ function changeOnlineStatus(json) {
 
 function writeMessageFromJson(json) {
     writeToScreen("Message Received: " + json.message);
+}
+
+function writeAboutException(message) {
+    var pre = document.createElement("p");
+    pre.style.wordWrap = "break-word";
+    pre.innerHTML = message;
+
+    document.getElementById('output_box').appendChild(pre);
+}
+
+function writeToScreen(message) {
+    if (output === undefined) {
+        setOutput();
+    }
+    var pre = document.createElement("p");
+    pre.style.wordWrap = "break-word";
+    pre.innerHTML = message;
+
+    output.appendChild(pre);
 }
 
 function functionChangingChat(idUser) {

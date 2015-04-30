@@ -1,7 +1,5 @@
 package com.gist.github.xMIFx.StoreHouse.Entity.Interfaces;
 
-import com.gist.github.xMIFx.StoreHouse.Entity.StringCrypter;
-
 import java.util.UUID;
 
 /**
@@ -49,44 +47,4 @@ public abstract class Directory {
         return "00000000-0000-0000-0000-000000000000";
     }
 
-    public static String getXorUUID(String uuid, String k) {
-        byte[] txt = uuid.getBytes();
-        byte[] key = k.getBytes();
-        byte[] res = new byte[uuid.length()];
-
-        for (int i = 0; i < txt.length; i++) {
-            res[i] = (byte) (txt[i] ^ key[i % key.length]);
-        }
-        String result = new String(res);
-        return changedSymbolsForWeb(result, true);
-    }
-
-    private static String changedSymbolsForWeb(String result,boolean toWeb) {
-
-        char[] chars = result.toCharArray();
-       StringBuilder builder = new StringBuilder();
-       for (char ch:chars){
-           if (toWeb)
-           {
-
-           }
-           else {
-
-           }
-       }
-        return builder.toString();
-    }
-
-    public static String getUnXorUUID(String xorUUID, String k) {
-        byte[] txt = xorUUID.getBytes();
-        byte[] key = k.getBytes();
-        byte[] res = new byte[xorUUID.length()];
-
-        for (int i = 0; i < txt.length; i++) {
-            res[i] = (byte) (txt[i] ^ key[i % key.length]);
-        }
-
-        return changedSymbolsForWeb(new String(res),false);
-
-    }
 }

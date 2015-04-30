@@ -1,5 +1,7 @@
 package com.gist.github.xMIFx.StoreHouse.Entity.Directories;
 
+import java.util.Date;
+
 /**
  * Created by bukatinvv on 16.04.2015.
  */
@@ -7,17 +9,32 @@ public class Messages {
 
 
     private String userFromUUID;
+    private int idMessage;
     private int chatID;
     private String message;
     private boolean currentUserMessage;
     private boolean newMessage;
+    private Date dateMessage;
     private final String type = "Messages"; //for json
 
-    public Messages(String userFromUUID, int chatID, String message, boolean newMessage) {
+    public Messages() {
+    }
+
+    public Messages(String userFromUUID, int chatID, int id, String message, boolean newMessage, Date dateMessage) {
         this.userFromUUID = userFromUUID;
         this.chatID = chatID;
         this.message = message;
+        this.idMessage = id;
         this.newMessage = newMessage;
+        this.dateMessage = dateMessage;
+    }
+
+    public int getIdMessage() {
+        return idMessage;
+    }
+
+    public void setIdMessage(int idMessage) {
+        this.idMessage = idMessage;
     }
 
     public boolean isCurrentUserMessage() {
@@ -58,6 +75,14 @@ public class Messages {
 
     public void setNewMessage(boolean newMessage) {
         this.newMessage = newMessage;
+    }
+
+    public Date getDateMessage() {
+        return dateMessage;
+    }
+
+    public void setDateMessage(Date dateMessage) {
+        this.dateMessage = dateMessage;
     }
 
     @Override
