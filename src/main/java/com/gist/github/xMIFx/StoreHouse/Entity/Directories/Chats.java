@@ -1,9 +1,7 @@
 package com.gist.github.xMIFx.StoreHouse.Entity.Directories;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by bukatinvv on 16.04.2015.
@@ -11,18 +9,26 @@ import java.util.Set;
 public class Chats {
     private int idChat;
     private String nameChat;
-    private Set<String> userUUIDList;
-    private List<Messages> messagesList;
+    private Set<User> userList;
+    private Set<Messages> messagesList;
     private final String type = "Chat"; //for json
 
     public Chats() {
     }
 
-    public Chats(int idChat, String nameChat, Set<String> userUUIDList, List<Messages> messagesList) {
+    public Chats(int idChat, String nameChat) {
         this.idChat = idChat;
         this.nameChat = nameChat;
-        this.userUUIDList = userUUIDList;
-        this.messagesList = messagesList;
+    }
+
+    public Chats(int idChat, String nameChat, Set<User> userList, Set<Messages> messagesList) {
+        this.idChat = idChat;
+        this.nameChat = nameChat;
+        this.userList = userList;
+        if (this.messagesList == null) {
+            this.messagesList = Collections.newSetFromMap(new ConcurrentHashMap());
+        }
+        this.messagesList.addAll(messagesList);
     }
 
     public int getIdChat() {
@@ -33,6 +39,10 @@ public class Chats {
         return nameChat;
     }
 
+    public String getType() {
+        return type;
+    }
+
     public void setNameChat(String nameChat) {
         this.nameChat = nameChat;
     }
@@ -41,42 +51,48 @@ public class Chats {
         this.idChat = idChat;
     }
 
-    public Set<String> getUserUUIDList() {
-        return userUUIDList;
+    public Set<User> getUserList() {
+        if (userList == null) {
+            userList = new HashSet<>();
+        }
+        return userList;
     }
 
-    public void setUserUUIDList(Set<String> userUUIDList) {
-        this.userUUIDList = userUUIDList;
-    }
-
-    public List<Messages> getMessagesList() {
+    public Set<Messages> getMessagesList() {
+        if (messagesList == null) {
+            messagesList = Collections.newSetFromMap(new ConcurrentHashMap());
+        }
         return messagesList;
     }
 
-    public void setMessagesList(List<Messages> messagesList) {
-        this.messagesList = messagesList;
-    }
-
-    public void addUser(String userUUID) {
-        if (userUUIDList == null) {
-            userUUIDList = new HashSet<>();
+    public void addMessage(Messages mes) {
+        if (messagesList == null) {
+            messagesList = Collections.newSetFromMap(new ConcurrentHashMap());
         }
-        userUUIDList.add(userUUID);
+        messagesList.add(mes);
+
     }
 
     public void addUser(User user) {
-        if (userUUIDList == null) {
-            userUUIDList = new HashSet<>();
+        if (userList == null) {
+            userList = new HashSet<>();
         }
-        userUUIDList.add(user.getUuid());
+        userList.add(user);
     }
 
-    public boolean containsUser(String userUUID) {
-        return userUUIDList.contains(userUUID);
-    }
 
     public boolean containsUser(User user) {
-        return userUUIDList.contains(user.getUuid());
+        if (userList == null) {
+            return false;
+        }
+        return userList.contains(user.getUuid());
+    }
+
+    public boolean containsMessage(Messages message) {
+        if (messagesList == null) {
+            return false;
+        }
+        return messagesList.contains(message);
     }
 
     @Override
@@ -99,7 +115,7 @@ public class Chats {
     public String toString() {
         return "Chats{" +
                 "idChat=" + idChat +
-                ", userUUIDList=" + userUUIDList +
+                ", userList=" + userList +
                 ", messagesList=" + messagesList +
                 ", type=" + type +
                 '}';

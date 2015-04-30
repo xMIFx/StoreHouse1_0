@@ -75,7 +75,13 @@ function parseJsonStr(str) {
     else if (json.type == "Exception") {
         writeAboutException(json.value);
     }
-    else{ writeMessageFromJson(json);}
+    else if (json.type == "Chat") {
+      writeAboutChat(json);
+    }
+    else {
+        writeToScreen(json.type)
+        writeToScreen(str)
+    }
 }
 
 
@@ -129,4 +135,11 @@ function functionChangingChat(idUser) {
         }
     );
     doSend(json);
+}
+
+function writeAboutChat(json) {
+    if (output === undefined) {
+        setOutput();
+    }
+    output.id = 'chatUser_' + json.idChat;
 }

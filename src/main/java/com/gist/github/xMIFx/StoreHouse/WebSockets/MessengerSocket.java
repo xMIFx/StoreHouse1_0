@@ -95,6 +95,7 @@ public class MessengerSocket extends DependenceInjectionServlet {
         ObjectMapper mapper = new ObjectMapper();
         try {
             String jsonStr = mapper.writeValueAsString(chat);
+           System.out.println(jsonStr);
             session.getBasicRemote().sendText(jsonStr);
         } catch (IOException e) {
             createSendMessageAboutException(session);

@@ -15,4 +15,5 @@ public interface ChatDao {
     List<Messages> getAllMessagesByChat(int ID);
     List<Messages> getLastMessagesByChat(int ID);
     Chats getChatBetweenUsers(String user1,String user2) throws SQLException;
+    int saveMessage(Messages mes) throws SQLException;
 }

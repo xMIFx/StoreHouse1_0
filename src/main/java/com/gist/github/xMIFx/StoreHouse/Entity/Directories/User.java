@@ -4,6 +4,7 @@ import com.gist.github.xMIFx.StoreHouse.Entity.Interfaces.Directory;
 import com.gist.github.xMIFx.StoreHouse.Entity.OtherHelpingEntity.Crypting.AesException;
 import com.gist.github.xMIFx.StoreHouse.Entity.OtherHelpingEntity.Crypting.StringCrypter;
 import com.google.common.html.HtmlEscapers;
+import org.codehaus.jackson.annotate.JsonIgnore;
 
 import java.util.Date;
 
@@ -21,7 +22,7 @@ public class User extends Directory {
     public String telephone;
     public Date birthDay;
     public boolean consumeVisible;
-    public MessengerGroup messengerGroup;
+    private MessengerGroup messengerGroup;
     public boolean online;
     private final String type = "User"; //for json
     private static final String keyForCrypt = "IKnowNothing";
@@ -133,12 +134,18 @@ public class User extends Directory {
         return email;
     }
 
+    @JsonIgnore
     public UserInterface getUserInterface() {
         return userInterface;
     }
 
+    @JsonIgnore
     public UserRoles getRole() {
         return role;
+    }
+    @JsonIgnore
+    public MessengerGroup getMessengerGroup() {
+        return messengerGroup;
     }
 
     public Date getBirthDay() {
@@ -161,6 +168,10 @@ public class User extends Directory {
         return cryptUUID;
     }
 
+    public String getType() {
+        return type;
+    }
+
     public boolean isConsumeVisible() {
         return consumeVisible;
     }
@@ -169,9 +180,7 @@ public class User extends Directory {
         this.consumeVisible = consumeVisible;
     }
 
-    public MessengerGroup getMessengerGroup() {
-        return messengerGroup;
-    }
+
 
     public void setMessengerGroup(MessengerGroup messengerGroup) {
         this.messengerGroup = messengerGroup;

@@ -1,5 +1,7 @@
 package com.gist.github.xMIFx.StoreHouse.Entity.Interfaces;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+
 import java.util.UUID;
 
 /**
@@ -15,6 +17,7 @@ public abstract class Directory {
         this.uuid = uuid;
     }
 
+    @JsonIgnore
     public String getUuid() {
         return uuid;
     }
@@ -42,6 +45,7 @@ public abstract class Directory {
     protected static String createGuid() {
         return UUID.randomUUID().toString();
     }
+
 
     public static String getEmptyUUID() {
         return "00000000-0000-0000-0000-000000000000";

@@ -2,14 +2,15 @@ package com.gist.github.xMIFx.StoreHouse.dao.Impl;
 
 import com.gist.github.xMIFx.StoreHouse.Entity.Directories.Chats;
 import com.gist.github.xMIFx.StoreHouse.Entity.Directories.Messages;
+import com.gist.github.xMIFx.StoreHouse.Entity.Directories.User;
 import com.gist.github.xMIFx.StoreHouse.dao.Interfaces.ChatDao;
+import com.gist.github.xMIFx.StoreHouse.dao.Interfaces.UserDao;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -38,15 +39,17 @@ public class ChatDaoJdbc implements ChatDao {
             if (autoIncKeyId == -1) {
                 throw new SQLException("can't get iD");
             }
-            for (String userUUID : chat.getUserUUIDList()) {
+            for (User user : chat.getUserList()) {
                 st.executeUpdate("INSERT INTO `storehouse`.`chatsusers` (`idChat`, `user`) " +
-                        "VALUES ('" + autoIncKeyId + "', '" + userUUID + "');");
+                        "VALUES ('" + autoIncKeyId + "', '" + user.getUuid() + "');");
 
             }
 
-            /*for (Messages message : chat.getMessagesList()) {
-
-            }*/
+            for (Messages message : chat.getMessagesList()) {
+                if (message.getIdMessage() == 0) {
+                   message.setIdMessage(saveMessage(message));
+                }
+            }
         }
         return autoIncKeyId;
     }
@@ -95,38 +98,61 @@ public class ChatDaoJdbc implements ChatDao {
                      "order by messages.dateMessage\n" +
                      "LIMIT 15;")) {
 
-            List<Messages> messageList = new ArrayList<>();
+
             while (resultSet.next()) {
-                if (chat == null) {
+
+                  if (chat == null) {
                     chat = new Chats();
-                    chat.addUser(user1);
-                    chat.addUser(user2);
+                    chat.addUser(UserDao.getAllUser().get(user1));
+                    chat.addUser(UserDao.getAllUser().get(user2));
                     chat.setNameChat(resultSet.getString("nameChat"));
                     chat.setIdChat(resultSet.getInt("idChat"));
                 }
                 if (resultSet.getInt("idMessage") != 0) {
-                    Messages message = new Messages(resultSet.getString("UserFrom")
+                    Messages message = new Messages(UserDao.getAllUser().get(resultSet.getString("UserFrom"))
                             , resultSet.getInt("idChat")
                             , resultSet.getInt("idMessage")
                             , resultSet.getString("message")
                             , resultSet.getBoolean("new")
                             , resultSet.getDate("dateMessage"));
-                    messageList.add(message);
+                    chat.addMessage(message);
                 }
             }
             if (chat == null) {
                 chat = new Chats();
-                chat.addUser(user1);
-                chat.addUser(user2);
+                chat.addUser(UserDao.getAllUser().get(user1));
+                chat.addUser(UserDao.getAllUser().get(user2));
                 chat.setNameChat("BetweenUsers");
                 chat.setIdChat(saveNewChat(chat));
-             }
-            chat.setMessagesList(messageList);
+            }
+            ;
 
 
         }
 
         return chat;
+    }
+
+    @Override
+    public int saveMessage(Messages mes) throws SQLException {
+        Connection connection = dataSource.getConnection();
+        int autoIncKeyId = -1;
+        try (Statement st = connection.createStatement()) {
+            st.executeUpdate("INSERT INTO `storehouse`.`messages` (`idChat`, `UserFrom`, `new`, `message`, `dateMessage`) " +
+                    "VALUES ('"+mes.getChatID()+"', '"+mes.getUserFrom().getUuid()+"', '"+mes.isNewMessage()+"'', '"+mes.getMessage()+"', '"+mes.getDateMessage()+"');"
+                    , Statement.RETURN_GENERATED_KEYS);
+
+            try (ResultSet rs = st.getGeneratedKeys()) {
+                if (rs.next()) {
+                    autoIncKeyId = rs.getInt(1);
+                }
+            }
+            if (autoIncKeyId == -1) {
+                throw new SQLException("can't get iD");
+            }
+
+        }
+        return autoIncKeyId;
     }
 
 }

@@ -8,7 +8,7 @@ import java.util.Date;
 public class Messages {
 
 
-    private String userFromUUID;
+    private User userFrom;
     private int idMessage;
     private int chatID;
     private String message;
@@ -20,8 +20,8 @@ public class Messages {
     public Messages() {
     }
 
-    public Messages(String userFromUUID, int chatID, int id, String message, boolean newMessage, Date dateMessage) {
-        this.userFromUUID = userFromUUID;
+    public Messages(User userFrom, int chatID, int id, String message, boolean newMessage, Date dateMessage) {
+        this.userFrom = userFrom;
         this.chatID = chatID;
         this.message = message;
         this.idMessage = id;
@@ -45,12 +45,12 @@ public class Messages {
         this.currentUserMessage = currentUserMessage;
     }
 
-    public String getUserFromUUID() {
-        return userFromUUID;
+    public User getUserFrom() {
+        return userFrom;
     }
 
-    public void setUserFromUUID(String userFromUUID) {
-        this.userFromUUID = userFromUUID;
+    public void setUserFrom(User userFrom) {
+        this.userFrom = userFrom;
     }
 
     public int getChatID() {
@@ -81,6 +81,10 @@ public class Messages {
         return dateMessage;
     }
 
+    public String getType() {
+        return type;
+    }
+
     public void setDateMessage(Date dateMessage) {
         this.dateMessage = dateMessage;
     }
@@ -92,25 +96,29 @@ public class Messages {
 
         Messages messages = (Messages) o;
 
+        if (idMessage != messages.idMessage) return false;
         if (chatID != messages.chatID) return false;
-        if (userFromUUID != null ? !userFromUUID.equals(messages.userFromUUID) : messages.userFromUUID != null)
+        if (userFrom != null ? !userFrom.equals(messages.userFrom) : messages.userFrom != null)
             return false;
-        return !(message != null ? !message.equals(messages.message) : messages.message != null);
+        if (message != null ? !message.equals(messages.message) : messages.message != null) return false;
+        return !(dateMessage != null ? !dateMessage.equals(messages.dateMessage) : messages.dateMessage != null);
 
     }
 
     @Override
     public int hashCode() {
-        int result = userFromUUID != null ? userFromUUID.hashCode() : 0;
+        int result = userFrom != null ? userFrom.hashCode() : 0;
+        result = 31 * result + idMessage;
         result = 31 * result + chatID;
         result = 31 * result + (message != null ? message.hashCode() : 0);
+        result = 31 * result + (dateMessage != null ? dateMessage.hashCode() : 0);
         return result;
     }
 
     @Override
     public String toString() {
         return "Messages{" +
-                "userFromUUID='" + userFromUUID + '\'' +
+                "userFromUUID='" + userFrom + '\'' +
                 ", chatID=" + chatID +
                 ", message='" + message + '\'' +
                 ", currentUserMessage=" + currentUserMessage +
