@@ -9,7 +9,7 @@
 <html>
 <head>
     <title></title>
-    <link href="${pageContext.request.contextPath}/pages/UserStyle.css" rel="stylesheet" type="text/css" >
+    <link href="${pageContext.request.contextPath}/cssFiles/UserStyle.css" rel="stylesheet" type="text/css" >
 </head>
 <body>
 <form method="post" action="/authorization.do">

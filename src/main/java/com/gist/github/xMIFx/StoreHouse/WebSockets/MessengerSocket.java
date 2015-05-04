@@ -5,8 +5,11 @@ package com.gist.github.xMIFx.StoreHouse.WebSockets;
  */
 
 import com.gist.github.xMIFx.StoreHouse.Entity.Directories.Chats;
+import com.gist.github.xMIFx.StoreHouse.Entity.Directories.Messages;
 import com.gist.github.xMIFx.StoreHouse.Entity.Directories.User;
+import com.gist.github.xMIFx.StoreHouse.Entity.OtherHelpingEntity.Consts.UserConstant;
 import com.gist.github.xMIFx.StoreHouse.Entity.OtherHelpingEntity.Crypting.AesException;
+import com.gist.github.xMIFx.StoreHouse.Injects.DependenceInjectionClass;
 import com.gist.github.xMIFx.StoreHouse.Injects.DependenceInjectionServlet;
 import com.gist.github.xMIFx.StoreHouse.Injects.Inject;
 import com.gist.github.xMIFx.StoreHouse.SQLPack.TransactionManager;
@@ -16,22 +19,24 @@ import com.gist.github.xMIFx.StoreHouse.dao.Interfaces.UserDao;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
 import org.codehaus.jackson.type.TypeReference;
+import sun.misc.resources.Messages_es;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.ServletException;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 
 @ServerEndpoint(value = "/messenger.do/chat", configurator = EndpointConfiguratorChat.class)
-public class MessengerSocket extends DependenceInjectionServlet {
+public class MessengerSocket extends DependenceInjectionClass {
     private static final String COOKIE_FOR_WEBSOCKET = "curentUser";
-
-    private static Map<String, Session> usersWebSocketSession = Collections.synchronizedMap(new HashMap<String, Session>());
+    private static Map<String, Session> usersWebSocketSession = new ConcurrentHashMap<String, Session>();
 
     private EndpointConfig config;
 
@@ -46,8 +51,8 @@ public class MessengerSocket extends DependenceInjectionServlet {
     public void onOpen(Session session, EndpointConfig config) {
         this.config = config;
         try {
-            init();
-        } catch (ServletException e) {
+            initialize();
+        } catch (IllegalAccessException e) {
             createSendMessageAboutException(session);
         }
         usersWebSocketSession.put((String) config.getUserProperties().get(COOKIE_FOR_WEBSOCKET), session);
@@ -73,13 +78,14 @@ public class MessengerSocket extends DependenceInjectionServlet {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        System.out.println(msg);
         if (myMap != null && myMap.get("type").equals("Messages")) {
-            sendMessage(session, msg);
+            sendMessage(session, msg, myMap);
         } else if (myMap != null && myMap.get("type").equals("Chat")) {
             try {
                 String userToUUID = User.decryptUUID(myMap.get("userTo"));
                 Chats chat = txManager.doInTransaction(() -> chatsDao.getChatBetweenUsers((String) config.getUserProperties().get(COOKIE_FOR_WEBSOCKET), userToUUID));
-                sendMessageAboutChat(session,chat);
+                sendMessageAboutChat(session, chat);
             } catch (AesException e) {
                 createSendMessageAboutException(session);
                 e.printStackTrace();
@@ -95,7 +101,7 @@ public class MessengerSocket extends DependenceInjectionServlet {
         ObjectMapper mapper = new ObjectMapper();
         try {
             String jsonStr = mapper.writeValueAsString(chat);
-           System.out.println(jsonStr);
+            System.out.println(jsonStr);
             session.getBasicRemote().sendText(jsonStr);
         } catch (IOException e) {
             createSendMessageAboutException(session);
@@ -118,8 +124,24 @@ public class MessengerSocket extends DependenceInjectionServlet {
 
     }
 
-    public void sendMessage(Session session, String msg) {
-        for (Map.Entry<String, Session> pair : usersWebSocketSession.entrySet()) {
+    public void sendMessage(Session session, String msg, Map<String, String> myMap) {
+        try {
+            Messages newMessage = new Messages(
+                    UserConstant.getUserConst().getAllUser().get(User.decryptUUID(myMap.get("userFrom"))),
+                    Integer.valueOf(myMap.get("chatID")),
+                    myMap.get("message"),
+                    Boolean.valueOf(myMap.get("newMessage")),
+                    new Date(Long.valueOf(myMap.get("dateMessage"))));
+            newMessage.setIdMessage(txManager.doInTransaction(() -> chatsDao.saveMessage(newMessage)));
+            ObjectMapper mapper = new ObjectMapper();
+            String jsonStr = mapper.writeValueAsString(newMessage);
+            session.getBasicRemote().sendText(jsonStr);
+            if (usersWebSocketSession.containsKey(User.decryptUUID(myMap.get("userFrom")))) {
+                usersWebSocketSession.get(User.decryptUUID(myMap.get("userFrom"))).getBasicRemote().sendText(jsonStr);
+
+            }
+
+        /*for (Map.Entry<String, Session> pair : usersWebSocketSession.entrySet()) {
 
             try {
                 if (pair.getValue().isOpen() && pair.getValue() != session) {
@@ -133,6 +155,16 @@ public class MessengerSocket extends DependenceInjectionServlet {
                     e1.printStackTrace();
                 }
             }
+        }*/
+        } catch (SQLException e) {
+            e.printStackTrace();
+            createSendMessageAboutException(session);
+        } catch (AesException e) {
+            e.printStackTrace();
+            createSendMessageAboutException(session); //need something about message
+        } catch (IOException e) {
+            e.printStackTrace();
+            createSendMessageAboutException(session); //need something about message
         }
 
     }
@@ -148,23 +180,24 @@ public class MessengerSocket extends DependenceInjectionServlet {
         for (Map.Entry<String, Session> pair : usersWebSocketSession.entrySet()) {
             System.out.println("beginning sending");
             // if consume changed online status, we need inform only for user with consumeVisible
-            if (user.getRole().getiD() == UserDao.getAllUser().get(User.getEmptyUUID()).getRole().getiD()
-                    && !UserDao.getAllUser().get(pair.getKey()).isConsumeVisible()) {
-                System.out.println("message not sending");
-                continue;
-            }
-            // if user changed online status with out consumeVisible, we don't need inform consumers
-            if (!user.isConsumeVisible()
-                    && UserDao.getAllUser().get(User.getEmptyUUID()).getRole().getiD()
-                    == UserDao.getAllUser().get(pair.getKey()).getRole().getiD()) {
-                System.out.println("message not sending");
-                continue;
-            }
-
             try {
+                if (user.getRole().getiD() == UserConstant.getUserConst().getAllUser().get(User.getEmptyUUID()).getRole().getiD()
+                        && !UserConstant.getUserConst().getAllUser().get(pair.getKey()).isConsumeVisible()) {
+                    System.out.println("message not sending");
+                    continue;
+                }
+                // if user changed online status with out consumeVisible, we don't need inform consumers
+                if (!user.isConsumeVisible()
+                        && UserConstant.getUserConst().getAllUser().get(User.getEmptyUUID()).getRole().getiD()
+                        == UserConstant.getUserConst().getAllUser().get(pair.getKey()).getRole().getiD()) {
+                    System.out.println("message not sending");
+                    continue;
+                }
                 System.out.println("message sending");
                 pair.getValue().getBasicRemote().sendText(jsonStr);
             } catch (IOException e) {
+                e.printStackTrace();
+            } catch (SQLException e) {
                 e.printStackTrace();
             }
         }

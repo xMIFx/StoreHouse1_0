@@ -12,7 +12,6 @@ public class Messages {
     private int idMessage;
     private int chatID;
     private String message;
-    private boolean currentUserMessage;
     private boolean newMessage;
     private Date dateMessage;
     private final String type = "Messages"; //for json
@@ -29,6 +28,13 @@ public class Messages {
         this.dateMessage = dateMessage;
     }
 
+    public Messages(User userFrom, int chatID,  String message, boolean newMessage, Date dateMessage) {
+        this.userFrom = userFrom;
+        this.chatID = chatID;
+        this.message = message;
+        this.newMessage = newMessage;
+        this.dateMessage = dateMessage;
+    }
     public int getIdMessage() {
         return idMessage;
     }
@@ -37,13 +43,6 @@ public class Messages {
         this.idMessage = idMessage;
     }
 
-    public boolean isCurrentUserMessage() {
-        return currentUserMessage;
-    }
-
-    public void setCurrentUserMessage(boolean currentUserMessage) {
-        this.currentUserMessage = currentUserMessage;
-    }
 
     public User getUserFrom() {
         return userFrom;
@@ -118,12 +117,13 @@ public class Messages {
     @Override
     public String toString() {
         return "Messages{" +
-                "userFromUUID='" + userFrom + '\'' +
+                "userFrom=" + userFrom +
+                ", idMessage=" + idMessage +
                 ", chatID=" + chatID +
                 ", message='" + message + '\'' +
-                ", currentUserMessage=" + currentUserMessage +
                 ", newMessage=" + newMessage +
-                ", type=" + type +
+                ", dateMessage=" + dateMessage +
+                ", type='" + type + '\'' +
                 '}';
     }
 }

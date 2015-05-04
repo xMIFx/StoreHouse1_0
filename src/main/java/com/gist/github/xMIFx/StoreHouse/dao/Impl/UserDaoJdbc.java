@@ -1,6 +1,7 @@
 package com.gist.github.xMIFx.StoreHouse.dao.Impl;
 
 import com.gist.github.xMIFx.StoreHouse.Entity.Directories.*;
+import com.gist.github.xMIFx.StoreHouse.Entity.OtherHelpingEntity.Consts.UserConstant;
 import com.gist.github.xMIFx.StoreHouse.dao.Interfaces.UserDao;
 
 
@@ -166,7 +167,6 @@ public class UserDaoJdbc implements UserDao {
             }
             userList = new ArrayList<>();
             userList.addAll(userMap.values());
-            allUser.putAll(userMap);
         }
 
 
@@ -403,7 +403,7 @@ public class UserDaoJdbc implements UserDao {
     }
 
     @Override
-    public void setAllUser() throws SQLException {
+    public void setAllUser(Map<String, User> allUser) throws SQLException {
         Connection con = dataSource.getConnection();
         Map<String, User> userMap = new HashMap<>();
         Map<Integer, UserInterface> userInterfaceMap = new HashMap<>();
@@ -531,7 +531,12 @@ public class UserDaoJdbc implements UserDao {
                 }
             }
 
+            if (!allUser.isEmpty()) {
+                allUser.clear();
+            }
             allUser.putAll(userMap);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

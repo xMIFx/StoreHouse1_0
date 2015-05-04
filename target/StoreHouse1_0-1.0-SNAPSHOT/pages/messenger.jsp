@@ -15,7 +15,7 @@
     <title>Your First WebSocket!</title>
     <script src="${pageContext.request.contextPath}/jsFiles/sendMessages.js"></script>
     <script src="${pageContext.request.contextPath}/jsFiles/showHideFunction.js"></script>
-    <link href="${pageContext.request.contextPath}/pages/UserStyle.css" rel="stylesheet" type="text/css">
+    <link href="${pageContext.request.contextPath}/cssFiles/messangerStyle.css" rel="stylesheet" type="text/css">
 </head>
 
 <body>
@@ -40,7 +40,8 @@
         </c:forEach>
 
     </div>
-    <div id = "output_box" class="output_box">
+
+    <div id = "output_box" class="output_box" onload="initOutput()">
         <h1 style="text-align: center;">Hello World WebSocket Client</h1>
 
         <div style="text-align: center;">
@@ -50,6 +51,9 @@
             </form>
         </div>
         <div id="chatUser_0"></div>
+    </div>
+    <div class="information_about_chat" id="information_about_chat">
+        <br style="text-align: right;">information about current chat</br>
     </div>
 </div>
 </body>

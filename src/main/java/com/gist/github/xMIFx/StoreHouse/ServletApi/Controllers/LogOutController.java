@@ -1,6 +1,7 @@
 package com.gist.github.xMIFx.StoreHouse.ServletApi.Controllers;
 
 import com.gist.github.xMIFx.StoreHouse.Entity.Directories.User;
+import com.gist.github.xMIFx.StoreHouse.Entity.OtherHelpingEntity.Consts.UserConstant;
 import com.gist.github.xMIFx.StoreHouse.Injects.DependenceInjectionServlet;
 import com.gist.github.xMIFx.StoreHouse.dao.Interfaces.UserDao;
 
@@ -39,7 +40,7 @@ public class LogOutController extends DependenceInjectionServlet {
             User user = (User) req.getSession().getAttribute(COOKIE_USER);
             if (user != null) {
                 if (!user.getUuid().equals(User.getEmptyUUID())) {
-                    UserDao.getAllUser().get(user.getUuid()).setOnline(false);
+                    UserConstant.getUserConst().getAllUser().get(user.getUuid()).setOnline(false);
                 }
                 req.getSession().setAttribute(COOKIE_USER, null);
             }

@@ -3,6 +3,7 @@ package com.gist.github.xMIFx.StoreHouse.dao.Impl;
 import com.gist.github.xMIFx.StoreHouse.Entity.Directories.Chats;
 import com.gist.github.xMIFx.StoreHouse.Entity.Directories.Messages;
 import com.gist.github.xMIFx.StoreHouse.Entity.Directories.User;
+import com.gist.github.xMIFx.StoreHouse.Entity.OtherHelpingEntity.Consts.UserConstant;
 import com.gist.github.xMIFx.StoreHouse.dao.Interfaces.ChatDao;
 import com.gist.github.xMIFx.StoreHouse.dao.Interfaces.UserDao;
 
@@ -11,6 +12,8 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 /**
@@ -47,7 +50,7 @@ public class ChatDaoJdbc implements ChatDao {
 
             for (Messages message : chat.getMessagesList()) {
                 if (message.getIdMessage() == 0) {
-                   message.setIdMessage(saveMessage(message));
+                    message.setIdMessage(saveMessage(message));
                 }
             }
         }
@@ -101,15 +104,15 @@ public class ChatDaoJdbc implements ChatDao {
 
             while (resultSet.next()) {
 
-                  if (chat == null) {
+                if (chat == null) {
                     chat = new Chats();
-                    chat.addUser(UserDao.getAllUser().get(user1));
-                    chat.addUser(UserDao.getAllUser().get(user2));
+                    chat.addUser(UserConstant.getUserConst().getAllUser().get(user1));
+                    chat.addUser(UserConstant.getUserConst().getAllUser().get(user2));
                     chat.setNameChat(resultSet.getString("nameChat"));
                     chat.setIdChat(resultSet.getInt("idChat"));
                 }
                 if (resultSet.getInt("idMessage") != 0) {
-                    Messages message = new Messages(UserDao.getAllUser().get(resultSet.getString("UserFrom"))
+                    Messages message = new Messages(UserConstant.getUserConst().getAllUser().get(resultSet.getString("UserFrom"))
                             , resultSet.getInt("idChat")
                             , resultSet.getInt("idMessage")
                             , resultSet.getString("message")
@@ -120,8 +123,8 @@ public class ChatDaoJdbc implements ChatDao {
             }
             if (chat == null) {
                 chat = new Chats();
-                chat.addUser(UserDao.getAllUser().get(user1));
-                chat.addUser(UserDao.getAllUser().get(user2));
+                chat.addUser(UserConstant.getUserConst().getAllUser().get(user1));
+                chat.addUser(UserConstant.getUserConst().getAllUser().get(user2));
                 chat.setNameChat("BetweenUsers");
                 chat.setIdChat(saveNewChat(chat));
             }
@@ -136,10 +139,12 @@ public class ChatDaoJdbc implements ChatDao {
     @Override
     public int saveMessage(Messages mes) throws SQLException {
         Connection connection = dataSource.getConnection();
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        System.out.println(dateFormat.format(mes.getDateMessage()));
         int autoIncKeyId = -1;
         try (Statement st = connection.createStatement()) {
             st.executeUpdate("INSERT INTO `storehouse`.`messages` (`idChat`, `UserFrom`, `new`, `message`, `dateMessage`) " +
-                    "VALUES ('"+mes.getChatID()+"', '"+mes.getUserFrom().getUuid()+"', '"+mes.isNewMessage()+"'', '"+mes.getMessage()+"', '"+mes.getDateMessage()+"');"
+                    "VALUES ('" + mes.getChatID() + "', '" + mes.getUserFrom().getUuid() + "', '" + (mes.isNewMessage() ? 1 : 0) + "', '" + mes.getMessage() + "', '" + dateFormat.format(mes.getDateMessage()) + "');"
                     , Statement.RETURN_GENERATED_KEYS);
 
             try (ResultSet rs = st.getGeneratedKeys()) {

@@ -1,6 +1,7 @@
 package com.gist.github.xMIFx.StoreHouse.ServletApi.Controllers;
 
 import com.gist.github.xMIFx.StoreHouse.Entity.Directories.User;
+import com.gist.github.xMIFx.StoreHouse.Entity.OtherHelpingEntity.Consts.UserConstant;
 import com.gist.github.xMIFx.StoreHouse.Injects.DependenceInjectionServlet;
 import com.gist.github.xMIFx.StoreHouse.Injects.Inject;
 import com.gist.github.xMIFx.StoreHouse.SQLPack.ImplSQL.UnitOfWork;
@@ -47,7 +48,7 @@ public class AuthorizationController extends DependenceInjectionServlet {
         String enteredPassword = req.getParameter(PASSWORD);
         try {
             User user = txManager.doInTransaction(() -> userDao.selectByLoginPassword(enteredUserName, enteredPassword));
-            user = UserDao.getAllUser().get(user.getUuid());
+            user = UserConstant.getUserConst().getAllUser().get(user.getUuid());
             user.setOnline(true);
             Cookie userCookie = new Cookie(COOKIE_NAME, user.getUuid());
             userCookie.setMaxAge(3600);

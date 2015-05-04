@@ -1,6 +1,7 @@
 package com.gist.github.xMIFx.StoreHouse.ServletApi.Listeners;
 
 import com.gist.github.xMIFx.StoreHouse.Entity.Directories.User;
+import com.gist.github.xMIFx.StoreHouse.Entity.OtherHelpingEntity.Consts.UserConstant;
 import com.gist.github.xMIFx.StoreHouse.Injects.Inject;
 import com.gist.github.xMIFx.StoreHouse.dao.Interfaces.UserDao;
 
@@ -28,9 +29,13 @@ public class LoginListener implements HttpSessionListener {
         User disconnectUser = (User) httpSessionEvent.getSession().getAttribute(COOKIE_NAME);
 
         if (disconnectUser != null) {
-            if (!UserDao.getAllUser().isEmpty()) {
-                UserDao.getAllUser().get(disconnectUser.getUuid()).setOnline(false);//mark offline
+
+            try {
+                UserConstant.getUserConst().getAllUser().get(disconnectUser.getUuid()).setOnline(false);//mark offline
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
+
             System.out.println("destroyed " + disconnectUser.getName());
         }
     }

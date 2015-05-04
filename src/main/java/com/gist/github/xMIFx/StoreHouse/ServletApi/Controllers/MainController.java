@@ -3,6 +3,7 @@ package com.gist.github.xMIFx.StoreHouse.ServletApi.Controllers;
 import com.gist.github.xMIFx.StoreHouse.Entity.Directories.InterfaceMenu;
 import com.gist.github.xMIFx.StoreHouse.Entity.Directories.User;
 import com.gist.github.xMIFx.StoreHouse.Entity.Directories.UserInterface;
+import com.gist.github.xMIFx.StoreHouse.Entity.OtherHelpingEntity.Consts.UserConstant;
 import com.gist.github.xMIFx.StoreHouse.Injects.DependenceInjectionServlet;
 import com.gist.github.xMIFx.StoreHouse.Injects.Inject;
 import com.gist.github.xMIFx.StoreHouse.SQLPack.TransactionManager;
@@ -53,14 +54,14 @@ public class MainController extends DependenceInjectionServlet {
             }
             cookieFromClientFinal = cookieFromClient;
             try {
-                if(UserDao.getAllUser().isEmpty()){userDao.setAllUser();}
+
                 if (cookieFromClientFinal != null) {
-                    user = UserDao.getAllUser().get(cookieFromClientFinal.getValue());
+                    user = UserConstant.getUserConst().getAllUser().get(cookieFromClientFinal.getValue());
 
                            /*user = txManager.doInTransaction(() -> userDao.selectByUUID(cookieFromClientFinal.getValue()));*/
                 } else {
                     /*user = txManager.doInTransaction(() -> userDao.createSimpleUser());*/
-                    user = UserDao.getAllUser().get(User.getEmptyUUID());
+                    user = UserConstant.getUserConst().getAllUser().get(User.getEmptyUUID());
                 }
                 user.setOnline(true); // mark online
                 req.getSession().setAttribute(COOKIE_NAME, user);

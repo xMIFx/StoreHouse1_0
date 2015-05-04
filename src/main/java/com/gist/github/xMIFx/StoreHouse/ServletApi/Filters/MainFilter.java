@@ -1,6 +1,7 @@
 package com.gist.github.xMIFx.StoreHouse.ServletApi.Filters;
 
 import com.gist.github.xMIFx.StoreHouse.Entity.Directories.User;
+import com.gist.github.xMIFx.StoreHouse.Entity.OtherHelpingEntity.Consts.UserConstant;
 import com.gist.github.xMIFx.StoreHouse.Injects.ApplicationContextHolder;
 import com.gist.github.xMIFx.StoreHouse.Injects.DependenceInjectionServlet;
 import com.gist.github.xMIFx.StoreHouse.Injects.FieldReflector;
@@ -36,7 +37,7 @@ public class MainFilter extends DependenceInjectionServlet implements Filter {
     public void init(FilterConfig filterConfig) throws ServletException {
         init();
         this.filterConfig = filterConfig;
-    }
+     }
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
@@ -68,16 +69,13 @@ public class MainFilter extends DependenceInjectionServlet implements Filter {
         // Session destroyed with attributes, so we need to refresh it
         if (user == null) {
             try {
-                if (UserDao.getAllUser().isEmpty()) {
-                    userDao.setAllUser();
-                }
                 if (cookieFromClientFinal != null) {
-                    user = UserDao.getAllUser().get(cookieFromClient.getValue());
+                    user = UserConstant.getUserConst().getAllUser().get(cookieFromClient.getValue());
                     user.setOnline(true);
                     //  user = txManager.doInTransaction(() -> userDao.selectByUUID(cookieFromClientFinal.getValue()));
                 } else {
                     //  user = txManager.doInTransaction(() -> userDao.createSimpleUser());
-                    user = UserDao.getAllUser().get(User.getEmptyUUID());
+                    user = UserConstant.getUserConst().getAllUser().get(User.getEmptyUUID());
                 }
                 req.getSession().setAttribute(COOKIE_NAME, user);
                 } catch (SQLException e) {
