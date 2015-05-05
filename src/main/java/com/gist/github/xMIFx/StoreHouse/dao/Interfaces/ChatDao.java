@@ -12,6 +12,7 @@ import java.util.List;
 public interface ChatDao {
     int saveNewChat(Chats chat) throws SQLException;
     Chats getChatByID(int chatID);
+    List<String> getUsersFromChat(int chatID) throws SQLException;
     List<Messages> getAllMessagesByChat(int ID);
     List<Messages> getLastMessagesByChat(int ID);
     Chats getChatBetweenUsers(String user1,String user2) throws SQLException;

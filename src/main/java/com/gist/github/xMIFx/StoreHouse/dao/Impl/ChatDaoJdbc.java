@@ -14,6 +14,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -60,6 +61,23 @@ public class ChatDaoJdbc implements ChatDao {
     @Override
     public Chats getChatByID(int chatID) {
         return null;
+    }
+
+    @Override
+    public List<String> getUsersFromChat(int chatID) throws SQLException {
+        List<String> usersUUIDList = new ArrayList<>();
+        Connection con = dataSource.getConnection();
+        try (Statement st = con.createStatement();
+             ResultSet resultSet = st.executeQuery("SELECT \n" +
+                     "chatsusers.idChat\n" +
+                     ", chatsusers.user userUUID\n" +
+                     " FROM storehouse.chatsusers\n" +
+                     " where chatsusers.idChat ="+chatID +";")){
+            while (resultSet.next()) {
+                usersUUIDList.add(resultSet.getString("userUUID"));
+            }
+        }
+        return usersUUIDList;
     }
 
     @Override
@@ -140,7 +158,6 @@ public class ChatDaoJdbc implements ChatDao {
     public int saveMessage(Messages mes) throws SQLException {
         Connection connection = dataSource.getConnection();
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        System.out.println(dateFormat.format(mes.getDateMessage()));
         int autoIncKeyId = -1;
         try (Statement st = connection.createStatement()) {
             st.executeUpdate("INSERT INTO `storehouse`.`messages` (`idChat`, `UserFrom`, `new`, `message`, `dateMessage`) " +

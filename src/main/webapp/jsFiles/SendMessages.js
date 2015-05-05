@@ -152,7 +152,7 @@ function writeToScreenFromJson(messageJson) {
 
     //from
     var whoWright = document.createElement("p");
-    whoWright.innerHTML = messageJson.userFrom.login + " " + messageJson.dateMessage;
+    whoWright.innerHTML = messageJson.userFrom.login + " " + new Date(messageJson.dateMessage);
     whoWright.classList.add('WhoWright');
     //message
     var pre = document.createElement("p");

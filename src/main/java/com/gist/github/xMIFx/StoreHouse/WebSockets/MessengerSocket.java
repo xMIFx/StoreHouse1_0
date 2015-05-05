@@ -23,10 +23,7 @@ import sun.misc.resources.Messages_es;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.ServletException;
@@ -135,11 +132,15 @@ public class MessengerSocket extends DependenceInjectionClass {
             newMessage.setIdMessage(txManager.doInTransaction(() -> chatsDao.saveMessage(newMessage)));
             ObjectMapper mapper = new ObjectMapper();
             String jsonStr = mapper.writeValueAsString(newMessage);
-            session.getBasicRemote().sendText(jsonStr);
-            if (usersWebSocketSession.containsKey(User.decryptUUID(myMap.get("userFrom")))) {
-                usersWebSocketSession.get(User.decryptUUID(myMap.get("userFrom"))).getBasicRemote().sendText(jsonStr);
+            //session.getBasicRemote().sendText(jsonStr);
+            List<String> allUsersFromChat = txManager.doInTransaction(() -> chatsDao.getUsersFromChat(newMessage.getChatID()));
+            for (String userUUID : allUsersFromChat) {
+                if (usersWebSocketSession.containsKey(userUUID)) {
+                    usersWebSocketSession.get(userUUID).getBasicRemote().sendText(jsonStr);
 
+                }
             }
+
 
         /*for (Map.Entry<String, Session> pair : usersWebSocketSession.entrySet()) {
 
