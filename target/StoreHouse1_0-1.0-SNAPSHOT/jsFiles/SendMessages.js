@@ -151,8 +151,12 @@ function writeToScreenFromJson(messageJson) {
     }
 
     //from
+    var options = {
+        weekday: "long", year: "numeric", month: "short", hour12: false,
+        day: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit"
+    };
     var whoWright = document.createElement("p");
-    whoWright.innerHTML = messageJson.userFrom.login + " " + new Date(messageJson.dateMessage);
+    whoWright.innerHTML = messageJson.userFrom.login + " " + (new Date(messageJson.dateMessage)).toLocaleTimeString(navigator.language, options);
     whoWright.classList.add('WhoWright');
     //message
     var pre = document.createElement("p");
