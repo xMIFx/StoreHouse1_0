@@ -1,7 +1,9 @@
 /**
  * Created by bukatinvv on 02.04.2015.
  */
+
 var output;
+var arrayUsers = [];
 var cookieValue = getCookie('chat');
 var wsUri = "ws://" + document.location.host + document.location.pathname + "/chat";
 websocket = new WebSocket(wsUri);
@@ -16,6 +18,7 @@ websocket.onerror = function (evt) {
     onError(evt)
 };
 
+
 function getCookie(name) {
     var matches = document.cookie.match(new RegExp(
         "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
@@ -24,20 +27,36 @@ function getCookie(name) {
 }
 
 function send_message() {
-    var jsonStr = JSON.stringify({
-        "type": 'Messages',
-        "userFrom": cookieValue,
-        "message": document.getElementById('textID').value,
-        "newMessage": true,
-        "dateMessage": new Date().getTime(),
-        "chatID": output.id.substring(output.id.indexOf("_") + 1, output.id.length)
-    });
-    doSend(jsonStr);
-}
+    if (output.id != 'usersChat_0') {
 
+        var jsonStr = JSON.stringify({
+            "type": 'Messages',
+            "userFrom": cookieValue,
+            "message": document.getElementById('textID').value,
+            "newMessage": true,
+            "dateMessage": new Date().getTime(),
+            "chatID": output.id.substring(output.id.indexOf("_") + 1, output.id.length)
+        });
+       doSend(jsonStr);
+    }
+}
+function setArrayUsers(){
+    var elementsUsersChat = document.getElementById('information_about_chat').childNodes, strId, elUser, j = 0;
+    var reUs = new RegExp('chatsUsers', 'g');
+    while (elUser = elementsUsersChat[j++]) {
+        strId = elUser.id;
+        if (strId === undefined) {
+            continue;
+        }
+        else if (strId.match(reUs)) {
+            arrayUsers.push(strId.substring(11, strId.length));//11 = 'chatsUsers'.length+1
+        }
+
+    }
+}
 function setOutput() {
     var elements = document.getElementById("output_box").childNodes, i = 0, el;
-    var re = new RegExp('chatUser', 'g');
+    var re = new RegExp('usersChat', 'g');
 
     while (el = elements[i++]) {
         if (el.id === undefined) {
@@ -45,8 +64,10 @@ function setOutput() {
         }
         if (el.id.match(re)) {
             output = el;
+            break;
         }
     }
+    setArrayUsers();
 }
 
 function initOutput() {
@@ -79,7 +100,7 @@ function parseJsonStr(str) {
         changeOnlineStatus(json);
     }
     else if (json.type == "Messages") {
-        if (output.id == 'chatUser_' + json.chatID)
+        if (output.id == 'usersChat_' + json.chatID)
             writeToScreenFromJson(json);
         else {
             addNewMessages(json.userFrom);
@@ -182,14 +203,19 @@ function writeAboutChat(json) {
     if (output === undefined) {
         setOutput();
     }
-    if (output.id != 'chatUser_' + json.idChat) {
-        output.id = 'chatUser_' + json.idChat;
+    if (output.id != 'usersChat_' + json.idChat) {
+        output.id = 'usersChat_' + json.idChat;
         for (var i = 0; i < json.userList.length; i++) {
             var pre = document.createElement("p");
-            pre.style.wordWrap = "break-word";
             pre.innerHTML = json.userList[i].name;
+            pre.id = 'chatsUsers_' + json.userList[i].cryptUUID;
             document.getElementById('information_about_chat').appendChild(pre);
         }
+        setArrayUsers();
+        //sort by dateTime
+        json.messagesList.sort(function (a, b) {
+            return a.dateMessage - b.dateMessage;
+        });
         for (var j = 0; j < json.messagesList.length; j++) {
             writeToScreenFromJson(json.messagesList[j]);
         }

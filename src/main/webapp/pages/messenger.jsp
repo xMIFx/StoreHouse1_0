@@ -50,7 +50,7 @@
                 <input id="textID" name="message" value="Hello WebSocket!" type="text">
             </form>
         </div>
-        <div id="chatUser_0"></div>
+        <div id="usersChat_0"></div>
     </div>
     <div class="information_about_chat" id="information_about_chat">
         <br style="text-align: right;">information about current chat</br>

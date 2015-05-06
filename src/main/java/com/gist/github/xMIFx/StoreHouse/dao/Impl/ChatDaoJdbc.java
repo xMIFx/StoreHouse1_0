@@ -8,14 +8,11 @@ import com.gist.github.xMIFx.StoreHouse.dao.Interfaces.ChatDao;
 import com.gist.github.xMIFx.StoreHouse.dao.Interfaces.UserDao;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.Date;
 
 /**
  * Created by bukatinvv on 16.04.2015.
@@ -130,13 +127,14 @@ public class ChatDaoJdbc implements ChatDao {
                     chat.setIdChat(resultSet.getInt("idChat"));
                 }
                 if (resultSet.getInt("idMessage") != 0) {
-                    Messages message = new Messages(UserConstant.getUserConst().getAllUser().get(resultSet.getString("UserFrom"))
+                     Messages message = new Messages(UserConstant.getUserConst().getAllUser().get(resultSet.getString("UserFrom"))
                             , resultSet.getInt("idChat")
                             , resultSet.getInt("idMessage")
                             , resultSet.getString("message")
                             , resultSet.getBoolean("new")
-                            , resultSet.getDate("dateMessage"));
+                            , new Date(resultSet.getTimestamp("dateMessage").getTime()));
                     chat.addMessage(message);
+
                 }
             }
             if (chat == null) {

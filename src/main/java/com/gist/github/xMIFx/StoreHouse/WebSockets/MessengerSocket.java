@@ -10,23 +10,18 @@ import com.gist.github.xMIFx.StoreHouse.Entity.Directories.User;
 import com.gist.github.xMIFx.StoreHouse.Entity.OtherHelpingEntity.Consts.UserConstant;
 import com.gist.github.xMIFx.StoreHouse.Entity.OtherHelpingEntity.Crypting.AesException;
 import com.gist.github.xMIFx.StoreHouse.Injects.DependenceInjectionClass;
-import com.gist.github.xMIFx.StoreHouse.Injects.DependenceInjectionServlet;
 import com.gist.github.xMIFx.StoreHouse.Injects.Inject;
 import com.gist.github.xMIFx.StoreHouse.SQLPack.TransactionManager;
 import com.gist.github.xMIFx.StoreHouse.dao.Interfaces.ChatDao;
-import com.gist.github.xMIFx.StoreHouse.dao.Interfaces.InterfaceMenuDao;
-import com.gist.github.xMIFx.StoreHouse.dao.Interfaces.UserDao;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
 import org.codehaus.jackson.type.TypeReference;
-import sun.misc.resources.Messages_es;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.servlet.ServletException;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 
@@ -50,7 +45,7 @@ public class MessengerSocket extends DependenceInjectionClass {
         try {
             initialize();
         } catch (IllegalAccessException e) {
-            createSendMessageAboutException(session);
+            createSendMessageAboutException(session, "You can't whrite to this chat");
         }
         usersWebSocketSession.put((String) config.getUserProperties().get(COOKIE_FOR_WEBSOCKET), session);
     }
@@ -58,6 +53,11 @@ public class MessengerSocket extends DependenceInjectionClass {
     @OnClose
     public void onClose(Session session) {
         usersWebSocketSession.remove(this.config.getUserProperties().get(COOKIE_FOR_WEBSOCKET));
+    }
+
+    @OnError
+    public void onError(Session session,Throwable t){
+        t.printStackTrace();
     }
 
     @OnMessage
@@ -84,10 +84,10 @@ public class MessengerSocket extends DependenceInjectionClass {
                 Chats chat = txManager.doInTransaction(() -> chatsDao.getChatBetweenUsers((String) config.getUserProperties().get(COOKIE_FOR_WEBSOCKET), userToUUID));
                 sendMessageAboutChat(session, chat);
             } catch (AesException e) {
-                createSendMessageAboutException(session);
+                createSendMessageAboutException(session, "Sorry, try later");
                 e.printStackTrace();
             } catch (SQLException e) {
-                createSendMessageAboutException(session);
+                createSendMessageAboutException(session, "Sorry, try later");
                 e.printStackTrace();
             }
 
@@ -101,17 +101,17 @@ public class MessengerSocket extends DependenceInjectionClass {
             System.out.println(jsonStr);
             session.getBasicRemote().sendText(jsonStr);
         } catch (IOException e) {
-            createSendMessageAboutException(session);
+            createSendMessageAboutException(session, "Sorry, try later");
             e.printStackTrace();
         }
 
     }
 
-    private void createSendMessageAboutException(Session session) {
+    private void createSendMessageAboutException(Session session, String exeption) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode node = mapper.createObjectNode();
         node.put("type", "Exception");
-        node.put("value", "sorry! try later");
+        node.put("value", exeption);
         String jsonStr = node.toString();
         try {
             session.getBasicRemote().sendText(jsonStr);
@@ -123,22 +123,28 @@ public class MessengerSocket extends DependenceInjectionClass {
 
     public void sendMessage(Session session, String msg, Map<String, String> myMap) {
         try {
-            Messages newMessage = new Messages(
-                    UserConstant.getUserConst().getAllUser().get(User.decryptUUID(myMap.get("userFrom"))),
-                    Integer.valueOf(myMap.get("chatID")),
-                    myMap.get("message"),
-                    Boolean.valueOf(myMap.get("newMessage")),
-                    new Date(Long.valueOf(myMap.get("dateMessage"))));
-            newMessage.setIdMessage(txManager.doInTransaction(() -> chatsDao.saveMessage(newMessage)));
-            ObjectMapper mapper = new ObjectMapper();
-            String jsonStr = mapper.writeValueAsString(newMessage);
-            //session.getBasicRemote().sendText(jsonStr);
-            List<String> allUsersFromChat = txManager.doInTransaction(() -> chatsDao.getUsersFromChat(newMessage.getChatID()));
-            for (String userUUID : allUsersFromChat) {
-                if (usersWebSocketSession.containsKey(userUUID)) {
-                    usersWebSocketSession.get(userUUID).getBasicRemote().sendText(jsonStr);
+            List<String> allUsersFromChat = txManager.doInTransaction(() -> chatsDao.getUsersFromChat(Integer.valueOf(myMap.get("chatID"))));
+            if (allUsersFromChat.contains(User.decryptUUID(myMap.get("userFrom")))) {
+                Messages newMessage = new Messages(
+                        UserConstant.getUserConst().getAllUser().get(User.decryptUUID(myMap.get("userFrom"))),
+                        Integer.valueOf(myMap.get("chatID")),
+                        myMap.get("message"),
+                        Boolean.valueOf(myMap.get("newMessage")),
+                        new Date(Long.valueOf(myMap.get("dateMessage"))));
 
+                newMessage.setIdMessage(txManager.doInTransaction(() -> chatsDao.saveMessage(newMessage)));
+                ObjectMapper mapper = new ObjectMapper();
+                String jsonStr = mapper.writeValueAsString(newMessage);
+                //session.getBasicRemote().sendText(jsonStr);
+
+                for (String userUUID : allUsersFromChat) {
+                    if (usersWebSocketSession.containsKey(userUUID)) {
+                        usersWebSocketSession.get(userUUID).getBasicRemote().sendText(jsonStr);
+
+                    }
                 }
+            } else {
+                createSendMessageAboutException(session, "You can't write to this chat");
             }
 
 
@@ -159,13 +165,13 @@ public class MessengerSocket extends DependenceInjectionClass {
         }*/
         } catch (SQLException e) {
             e.printStackTrace();
-            createSendMessageAboutException(session);
+            createSendMessageAboutException(session, "Sorry, try later");
         } catch (AesException e) {
             e.printStackTrace();
-            createSendMessageAboutException(session); //need something about message
+            createSendMessageAboutException(session, "Sorry, try later"); //need something about message
         } catch (IOException e) {
             e.printStackTrace();
-            createSendMessageAboutException(session); //need something about message
+            createSendMessageAboutException(session, "Sorry, try latert"); //need something about message
         }
 
     }
