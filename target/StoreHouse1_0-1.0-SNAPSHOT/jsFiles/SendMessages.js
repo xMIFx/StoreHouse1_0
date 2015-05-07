@@ -7,7 +7,6 @@ var arrayUsers = [];
 var cookieValue = getCookie('chat');
 var wsUri = "ws://" + document.location.host + document.location.pathname + "/chat";
 websocket = new WebSocket(wsUri);
-
 websocket.onopen = function (evt) {
     onOpen(evt)
 };
@@ -18,6 +17,10 @@ websocket.onerror = function (evt) {
     onError(evt)
 };
 
+function closeIt() {
+    websocket.close();
+}
+window.onunload = closeIt;
 
 function getCookie(name) {
     var matches = document.cookie.match(new RegExp(
@@ -37,10 +40,11 @@ function send_message() {
             "dateMessage": new Date().getTime(),
             "chatID": output.id.substring(output.id.indexOf("_") + 1, output.id.length)
         });
-       doSend(jsonStr);
+        doSend(jsonStr);
     }
 }
-function setArrayUsers(){
+
+function setArrayUsers() {
     var elementsUsersChat = document.getElementById('information_about_chat').childNodes, strId, elUser, j = 0;
     var reUs = new RegExp('chatsUsers', 'g');
     while (elUser = elementsUsersChat[j++]) {
@@ -54,6 +58,7 @@ function setArrayUsers(){
 
     }
 }
+
 function setOutput() {
     var elements = document.getElementById("output_box").childNodes, i = 0, el;
     var re = new RegExp('usersChat', 'g');
@@ -93,6 +98,7 @@ function doSend(message) {
     websocket.send(message);
     //websocket.close();
 }
+
 
 function parseJsonStr(str) {
     var json = JSON.parse(str);
@@ -222,3 +228,18 @@ function writeAboutChat(json) {
     }
 }
 
+function addNewMessages(userFrom) {
+    var idForChange = "user_" + userFrom.id;
+    if (document.getElementById(idForChange) != null) {
+        var elements = document.getElementById(idForChange).childNodes, el, i = 0;
+        while (el = elements[i++]) {
+            if (el.classList === undefined) {
+                continue;
+            }
+            if (el.classList.contains("MessageCount")) {
+                alert(el.innerHTML);
+                el.innerHTML = (el.innerHTML === undefined||el.innerHTML==null||el.innerHTML=='') ? 1 : parseInt(el.innerHTML, 10) + 1;
+            }
+        }
+    }
+}

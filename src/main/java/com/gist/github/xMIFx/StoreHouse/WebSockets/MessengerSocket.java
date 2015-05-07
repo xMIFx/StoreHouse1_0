@@ -57,7 +57,7 @@ public class MessengerSocket extends DependenceInjectionClass {
 
     @OnError
     public void onError(Session session,Throwable t){
-        t.printStackTrace();
+        //t.printStackTrace(); ignored for first time
     }
 
     @OnMessage
@@ -90,9 +90,8 @@ public class MessengerSocket extends DependenceInjectionClass {
                 createSendMessageAboutException(session, "Sorry, try later");
                 e.printStackTrace();
             }
-
         }
-    }
+     }
 
     private void sendMessageAboutChat(Session session, Chats chat) {
         ObjectMapper mapper = new ObjectMapper();

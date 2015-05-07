@@ -19,10 +19,10 @@
 </head>
 
 <body>
+<a href="index.do">main</a>
 <div class="center">
     <div class="user_box">
         <c:forEach var="entry" items="${groupMap}">
-
             <div class="group">
                 <div class="open"></div>
                 <a href="javascript:" class="gr"
@@ -32,13 +32,12 @@
                         <li id="user_${chatUser.id}"
                             class=${chatUser.online?"online":"offline"}><a href="javascript:"
                                                                            onclick="functionChangingChat('${chatUser.cryptUUID}')">
-                            <span></span>${chatUser.name}</a>
+                            <span></span>${chatUser.name}</a><p class="MessageCount"></p>
                         </li>
                     </c:forEach>
                 </ul>
             </div>
         </c:forEach>
-
     </div>
 
     <div id = "output_box" class="output_box" onload="initOutput()">
