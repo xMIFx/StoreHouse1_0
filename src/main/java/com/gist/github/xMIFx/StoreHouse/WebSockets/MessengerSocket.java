@@ -56,7 +56,7 @@ public class MessengerSocket extends DependenceInjectionClass {
     }
 
     @OnError
-    public void onError(Session session,Throwable t){
+    public void onError(Session session, Throwable t) {
         //t.printStackTrace(); ignored for first time
     }
 
@@ -91,7 +91,7 @@ public class MessengerSocket extends DependenceInjectionClass {
                 e.printStackTrace();
             }
         }
-     }
+    }
 
     private void sendMessageAboutChat(Session session, Chats chat) {
         ObjectMapper mapper = new ObjectMapper();
@@ -130,16 +130,21 @@ public class MessengerSocket extends DependenceInjectionClass {
                         myMap.get("message"),
                         Boolean.valueOf(myMap.get("newMessage")),
                         new Date(Long.valueOf(myMap.get("dateMessage"))));
-
+                newMessage.addAllUserTo(allUsersFromChat, true, false);
                 newMessage.setIdMessage(txManager.doInTransaction(() -> chatsDao.saveMessage(newMessage)));
                 ObjectMapper mapper = new ObjectMapper();
-                String jsonStr = mapper.writeValueAsString(newMessage);
+
                 //session.getBasicRemote().sendText(jsonStr);
 
                 for (String userUUID : allUsersFromChat) {
                     if (usersWebSocketSession.containsKey(userUUID)) {
-                        usersWebSocketSession.get(userUUID).getBasicRemote().sendText(jsonStr);
-
+                        if (userUUID.equals(newMessage.getUserFrom().getUuid())) {
+                            newMessage.setNewMessage(newMessage.isNewMessageForSomeOne());
+                        } else {
+                            newMessage.setNewMessage(newMessage.isNewMessageForUserUUID(userUUID));
+                        }
+                        String jsonStr = mapper.writeValueAsString(newMessage);
+                       usersWebSocketSession.get(userUUID).getBasicRemote().sendText(jsonStr);
                     }
                 }
             } else {

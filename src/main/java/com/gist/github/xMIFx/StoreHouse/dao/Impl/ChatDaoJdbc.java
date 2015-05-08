@@ -5,7 +5,7 @@ import com.gist.github.xMIFx.StoreHouse.Entity.Directories.Messages;
 import com.gist.github.xMIFx.StoreHouse.Entity.Directories.User;
 import com.gist.github.xMIFx.StoreHouse.Entity.OtherHelpingEntity.Consts.UserConstant;
 import com.gist.github.xMIFx.StoreHouse.dao.Interfaces.ChatDao;
-import com.gist.github.xMIFx.StoreHouse.dao.Interfaces.UserDao;
+
 
 import javax.sql.DataSource;
 import java.sql.*;
@@ -158,8 +158,8 @@ public class ChatDaoJdbc implements ChatDao {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         int autoIncKeyId = -1;
         try (Statement st = connection.createStatement()) {
-            st.executeUpdate("INSERT INTO `storehouse`.`messages` (`idChat`, `UserFrom`, `new`, `message`, `dateMessage`) " +
-                    "VALUES ('" + mes.getChatID() + "', '" + mes.getUserFrom().getUuid() + "', '" + (mes.isNewMessage() ? 1 : 0) + "', '" + mes.getMessage() + "', '" + dateFormat.format(mes.getDateMessage()) + "');"
+            st.executeUpdate("INSERT INTO `storehouse`.`messages` (`idChat`, `UserFrom`, `message`, `dateMessage`) " +
+                    "VALUES ('" + mes.getChatID() + "', '" + mes.getUserFrom().getUuid() + "', '"  + mes.getMessage() + "', '" + dateFormat.format(mes.getDateMessage()) + "');"
                     , Statement.RETURN_GENERATED_KEYS);
 
             try (ResultSet rs = st.getGeneratedKeys()) {
@@ -170,6 +170,9 @@ public class ChatDaoJdbc implements ChatDao {
             if (autoIncKeyId == -1) {
                 throw new SQLException("can't get iD");
             }
+            for (String userToUUID: mes.getUsersTo()){
+            st.executeUpdate("INSERT INTO `storehouse`.`messagestouser` (`idmessage`, `userUUID`, `new`, `delete`) " +
+                    "VALUES ('"+autoIncKeyId+"', '"+userToUUID+"', '"+(mes.isNewMessageForUserUUID(userToUUID) ? 1 : 0)+"', '"+(mes.isDeletedMessageForUserUUID(userToUUID) ? 1 : 0)+"');");}
 
         }
         return autoIncKeyId;
