@@ -237,8 +237,7 @@ function addNewMessages(userFrom) {
                 continue;
             }
             if (el.classList.contains("MessageCount")) {
-                alert(el.innerHTML);
-                el.innerHTML = (el.innerHTML === undefined||el.innerHTML==null||el.innerHTML=='') ? 1 : parseInt(el.innerHTML, 10) + 1;
+                el.innerHTML = (el.innerHTML === undefined || el.innerHTML == null || el.innerHTML == '') ? 1 : parseInt(el.innerHTML, 10) + 1;
             }
         }
     }
