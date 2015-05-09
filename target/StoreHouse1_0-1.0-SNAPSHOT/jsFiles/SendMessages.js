@@ -80,7 +80,7 @@ function initOutput() {
 }
 
 function onOpen(evt) {
-    writeToScreen("Connected to Endpoint!");
+    //writeToScreen("Connected to Endpoint!");
     // doSend(textID.value);
 }
 
@@ -99,18 +99,16 @@ function doSend(message) {
     //websocket.close();
 }
 
-
 function parseJsonStr(str) {
     var json = JSON.parse(str);
     if (json.type == "User") {
         changeOnlineStatus(json);
     }
     else if (json.type == "Messages") {
-        if (output.id == 'usersChat_' + json.chatID)
+        if (output.id == 'usersChat_' + json.chatID) {
             writeToScreenFromJson(json);
-        else {
-            addNewMessages(json.userFrom);
         }
+        addNewMessages(json.userFrom);
     }
 
     else if (json.type == "Exception") {
@@ -194,12 +192,44 @@ function writeToScreenFromJson(messageJson) {
     output.appendChild(newMessage);
 }
 
-function functionChangingChat(idUser) {
+function functionChangingChat(UUIDUser, idUser) {
     //we need get chat id
+    var elements = document.getElementsByClassName('user_ch'), el, i = 0;
+    while (el = elements[i++]) {
+        if (el.classList.contains('active')) {
+            el.classList.remove('active')
+        }
+    }
+    var idForChange = "user_" + idUser;
+    if (document.getElementById(idForChange) != null) {
+        document.getElementById(idForChange).classList.add('active');
+    }
+
     var json = JSON.stringify({
             "type": "Chat",
             "operation": "gettingChatID",
-            "userTo": idUser
+            "userTo": UUIDUser
+        }
+    );
+    doSend(json);
+}
+
+function functionChangingChatByID(idChat){
+    var elements = document.getElementsByClassName('user_ch'), el, i = 0;
+    while (el = elements[i++]) {
+        if (el.classList.contains('active')) {
+            el.classList.remove('active')
+        }
+    }
+    var idForChange = "bigChat_" + idChat;
+    if (document.getElementById(idForChange) != null) {
+        document.getElementById(idForChange).classList.add('active');
+    }
+
+    var json = JSON.stringify({
+            "type": "bigChat",
+            "operation": "gettingChatID",
+            "userTo": idChat
         }
     );
     doSend(json);
@@ -209,7 +239,10 @@ function writeAboutChat(json) {
     if (output === undefined) {
         setOutput();
     }
+
     if (output.id != 'usersChat_' + json.idChat) {
+        removeChildrenRecursively(output);
+        removeChildrenRecursively(document.getElementById('information_about_chat'));
         output.id = 'usersChat_' + json.idChat;
         for (var i = 0; i < json.userList.length; i++) {
             var pre = document.createElement("p");
@@ -228,6 +261,14 @@ function writeAboutChat(json) {
     }
 }
 
+function removeChildrenRecursively(node) {
+    if (!node) return;
+    while (node.hasChildNodes()) {
+        removeChildrenRecursively(node.firstChild);
+        node.removeChild(node.firstChild);
+    }
+}
+
 function addNewMessages(userFrom) {
     var idForChange = "user_" + userFrom.id;
     if (document.getElementById(idForChange) != null) {
@@ -238,7 +279,19 @@ function addNewMessages(userFrom) {
             }
             if (el.classList.contains("MessageCount")) {
                 el.innerHTML = (el.innerHTML === undefined || el.innerHTML == null || el.innerHTML == '') ? 1 : parseInt(el.innerHTML, 10) + 1;
+                break;
             }
+        }
+        var parentsBrothers = document.getElementById(idForChange).parentNode.parentNode.childNodes, element, j = 0;
+        while (element = parentsBrothers[j++]) {
+            if (element.classList === undefined) {
+                continue;
+            }
+            if (element.classList.contains("MessageCount")) {
+                element.innerHTML = (element.innerHTML === undefined || element.innerHTML == null || element.innerHTML == '') ? 1 : parseInt(el.innerHTML, 10) + 1;
+                break;
+            }
+
         }
     }
 }

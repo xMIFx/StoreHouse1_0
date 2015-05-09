@@ -13,6 +13,8 @@ import com.gist.github.xMIFx.StoreHouse.Injects.DependenceInjectionClass;
 import com.gist.github.xMIFx.StoreHouse.Injects.Inject;
 import com.gist.github.xMIFx.StoreHouse.SQLPack.TransactionManager;
 import com.gist.github.xMIFx.StoreHouse.dao.Interfaces.ChatDao;
+import org.codehaus.jackson.JsonGenerationException;
+import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
 import org.codehaus.jackson.type.TypeReference;
@@ -48,6 +50,21 @@ public class MessengerSocket extends DependenceInjectionClass {
             createSendMessageAboutException(session, "You can't whrite to this chat");
         }
         usersWebSocketSession.put((String) config.getUserProperties().get(COOKIE_FOR_WEBSOCKET), session);
+        try {
+            Map<Chats, Integer> countMessageMap = txManager.doInTransaction(() -> chatsDao.getCountNewMassages((String) config.getUserProperties().get(COOKIE_FOR_WEBSOCKET)));
+            ObjectMapper mapper = new ObjectMapper();
+            String jsonStr = mapper.writeValueAsString(countMessageMap);
+            System.out.println(jsonStr);
+            //  session.getBasicRemote().sendText(jsonStr);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (JsonMappingException e) {
+            e.printStackTrace();
+        } catch (JsonGenerationException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @OnClose
@@ -90,7 +107,21 @@ public class MessengerSocket extends DependenceInjectionClass {
                 createSendMessageAboutException(session, "Sorry, try later");
                 e.printStackTrace();
             }
+        } else if (myMap != null && myMap.get("type").equals("bigChat")) {
+            try {
+                int chatID = Integer.valueOf(myMap.get("userTo"));
+                Chats chat = txManager.doInTransaction(() -> chatsDao.getChatByID(chatID));
+                if (chat.getUserList().contains(UserConstant.getUserConst().getAllUser().get((String) config.getUserProperties().get(COOKIE_FOR_WEBSOCKET)))) {
+                    sendMessageAboutChat(session, chat);
+                } else {
+                    createSendMessageAboutException(session, "You can't write to this chat");
+                }
+            } catch (SQLException e) {
+                createSendMessageAboutException(session, "Sorry, try later");
+                e.printStackTrace();
+            }
         }
+
     }
 
     private void sendMessageAboutChat(Session session, Chats chat) {
@@ -144,29 +175,13 @@ public class MessengerSocket extends DependenceInjectionClass {
                             newMessage.setNewMessage(newMessage.isNewMessageForUserUUID(userUUID));
                         }
                         String jsonStr = mapper.writeValueAsString(newMessage);
-                       usersWebSocketSession.get(userUUID).getBasicRemote().sendText(jsonStr);
+                        usersWebSocketSession.get(userUUID).getBasicRemote().sendText(jsonStr);
                     }
                 }
             } else {
                 createSendMessageAboutException(session, "You can't write to this chat");
             }
 
-
-        /*for (Map.Entry<String, Session> pair : usersWebSocketSession.entrySet()) {
-
-            try {
-                if (pair.getValue().isOpen() && pair.getValue() != session) {
-                    pair.getValue().getBasicRemote().sendText(msg, true);
-                }
-            } catch (IOException e) {
-                try {
-                    pair.getValue().close();
-                    e.printStackTrace();
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-            }
-        }*/
         } catch (SQLException e) {
             e.printStackTrace();
             createSendMessageAboutException(session, "Sorry, try later");

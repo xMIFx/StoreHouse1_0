@@ -18,6 +18,7 @@ public abstract class Directory {
     }
 
     @JsonIgnore
+
     public String getUuid() {
         return uuid;
     }
@@ -34,6 +35,10 @@ public abstract class Directory {
 
     }
 
+    public boolean isMarkForDelete() {
+        return markForDelete;
+    }
+
     public int getId() {
         return id;
     }
@@ -45,7 +50,6 @@ public abstract class Directory {
     protected static String createGuid() {
         return UUID.randomUUID().toString();
     }
-
 
     public static String getEmptyUUID() {
         return "00000000-0000-0000-0000-000000000000";

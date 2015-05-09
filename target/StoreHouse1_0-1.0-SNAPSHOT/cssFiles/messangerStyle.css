@@ -48,22 +48,25 @@ div.information_about_chat {
     width: 245px;
     display: inline-block;
     text-align: right;
+    float: right;
 }
 
 ul li {
     list-style: none;
 }
 
-div.group a.gr {
-    font-size: 16px;
-    font-weight: 700;
-    color: #000;
-}
+
 
 div.group a {
     margin-bottom: 9px;
     display: inline-block;
     vertical-align: middle;
+}
+div.group a.gr {
+    font-size: 16px;
+    font-weight: 700;
+    color: #000;
+    margin-bottom: 0px;
 }
 
 div.group ul {
@@ -119,7 +122,7 @@ div.open {
     height: 18px;
     display: inline-block;
     vertical-align: middle;
-    margin-top: -12px;
+    margin-top: -1px;
 }
 
 div.open.closed {
@@ -169,15 +172,32 @@ div.MessageClass p.MessageText{
 }
 
 div.NewMessage {
-    background: #CDC565;
+    background: rgba(255, 232, 153, 0.5);
+
 }
 
 div.MyMessage {
     text-align: right;
 }
+p.MessageCount{
+    margin: 0px;
+    display: inline-block;
+    font-size: 13px;
+    vertical-align: middle;
+    margin-bottom: 7px;
+}
+.glav{
+    text-align: center;
+    font-weight: 700;
 
+ }
+li.user_ch:hover{
+    background: #ccc;
+}
 
-
+li.user_ch.active{
+    background: #ccc;
+}
 
 
 

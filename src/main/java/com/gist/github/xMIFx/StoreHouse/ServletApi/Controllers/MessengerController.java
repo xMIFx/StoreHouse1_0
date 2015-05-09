@@ -1,11 +1,13 @@
 package com.gist.github.xMIFx.StoreHouse.ServletApi.Controllers;
 
+import com.gist.github.xMIFx.StoreHouse.Entity.Directories.Chats;
 import com.gist.github.xMIFx.StoreHouse.Entity.Directories.MessengerGroup;
 import com.gist.github.xMIFx.StoreHouse.Entity.Directories.User;
 import com.gist.github.xMIFx.StoreHouse.Entity.OtherHelpingEntity.Consts.UserConstant;
 import com.gist.github.xMIFx.StoreHouse.Injects.DependenceInjectionServlet;
 import com.gist.github.xMIFx.StoreHouse.Injects.Inject;
 import com.gist.github.xMIFx.StoreHouse.SQLPack.TransactionManager;
+import com.gist.github.xMIFx.StoreHouse.dao.Interfaces.ChatDao;
 import com.gist.github.xMIFx.StoreHouse.dao.Interfaces.UserDao;
 
 import javax.servlet.ServletException;
@@ -28,13 +30,15 @@ public class MessengerController extends DependenceInjectionServlet {
     private static final String COOKIE_NAME = "user";
     private static final String COOKIE_NAME_FOR_CHAT = "chat";
     private static final String ATTRIBUTE_GROUPS_TO_VIEW = "groupMap";
+    private static final String ATTRIBUTE_BIGCHATS_TO_VIEW = "bigChats";
+    private static final String ATTRIBUTE_LASTCHAT_TO_VIEW = "lastChats";
     private static final String PAGE_OK = "pages/messenger.jsp";
     private static final String PAGE_ERROR = "pages/errorPage.jsp";
     @Inject("txManager")
     private TransactionManager txManager;
 
-    @Inject("userDao")
-    private UserDao userDao;
+    @Inject("chatsDao")
+    private ChatDao chatsDao;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -48,10 +52,11 @@ public class MessengerController extends DependenceInjectionServlet {
             userList = new ArrayList<>();
             userList.addAll(UserConstant.getUserConst().getAllUser().values());
 
+
             //if user not registered, he can't send messages. Redirect on page with question/answer in future!!!
             if (userList == null) {/*NOP*/} else {
                 for (User user : userList) {
-                    if (user.equals(currentUser) || user.getUuid().equals(User.getEmptyUUID()) || user.markForDelete) {
+                    if (user.equals(currentUser) || user.getUuid().equals(User.getEmptyUUID()) || user.isMarkForDelete()) {
                         continue;
                     }
                     /*If current user is consume he can see only some people
@@ -76,9 +81,18 @@ public class MessengerController extends DependenceInjectionServlet {
                     }
                 }
             }
+            List<Chats> lastChat = txManager.doInTransaction(() -> chatsDao.getLastChats(currentUser.getUuid()));
+            //remove current user fromChat
+            for (Chats chat : lastChat) {
+                chat.getUserList().remove(currentUser);
+            }
+            List<Chats> bigChats = txManager.doInTransaction(()->chatsDao.getAllBigChatsByUser(currentUser.getUuid()));
+            req.setAttribute(ATTRIBUTE_BIGCHATS_TO_VIEW , bigChats);
+            req.setAttribute(ATTRIBUTE_LASTCHAT_TO_VIEW, lastChat);
             req.setAttribute(ATTRIBUTE_GROUPS_TO_VIEW, groupMap);
             req.getRequestDispatcher(PAGE_OK).forward(req, resp);
         } catch (SQLException e) {
+            e.printStackTrace();
             resp.sendRedirect(PAGE_ERROR);
         } catch (Exception e) {
             e.printStackTrace();

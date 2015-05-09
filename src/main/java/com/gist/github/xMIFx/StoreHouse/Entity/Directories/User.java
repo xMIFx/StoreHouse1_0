@@ -143,6 +143,7 @@ public class User extends Directory {
     public UserRoles getRole() {
         return role;
     }
+
     @JsonIgnore
     public MessengerGroup getMessengerGroup() {
         return messengerGroup;
@@ -179,8 +180,6 @@ public class User extends Directory {
     public void setConsumeVisible(boolean consumeVisible) {
         this.consumeVisible = consumeVisible;
     }
-
-
 
     public void setMessengerGroup(MessengerGroup messengerGroup) {
         this.messengerGroup = messengerGroup;
