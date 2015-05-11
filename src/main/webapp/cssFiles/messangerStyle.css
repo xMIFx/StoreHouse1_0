@@ -198,6 +198,11 @@ li.user_ch:hover{
 li.user_ch.active{
     background: #ccc;
 }
+div.chat_box{
+    height: 500px;
+    overflow-y: scroll;
+
+}
 
 
 

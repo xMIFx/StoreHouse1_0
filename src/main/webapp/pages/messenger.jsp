@@ -67,7 +67,7 @@
     <div id="output_box" class="output_box" onload="initOutput()">
 
 
-        <div id="usersChat_0"></div>
+        <div class="chat_box" id="usersChat_0"  onscroll="functionOnScrollChat(this)"></div>
         <div style="text-align: center;">
             <form action="">
                 <input onclick="send_message()" value="Send" type="button">
@@ -78,7 +78,8 @@
     <div class="information_about_chat" id="information_about_chat">
         <br style="text-align: right;">information about current chat</br>
     </div>
-    <div class="lastChats" id="lastChats">Last chats
+    <div class="lastChats">Last chats</div>
+    <div class="lastChats" id="lastChats">
         <c:forEach var="lastChat" items="${lastChats}">
             <c:if test="${lastChat.userList.size()>1}">
                 <li id="lastChat_${lastChat.idChat}"

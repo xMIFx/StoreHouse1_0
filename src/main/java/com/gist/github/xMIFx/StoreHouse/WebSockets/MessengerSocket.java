@@ -16,6 +16,7 @@ import com.gist.github.xMIFx.StoreHouse.dao.Interfaces.ChatDao;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.ObjectNode;
 import org.codehaus.jackson.type.TypeReference;
 
@@ -50,21 +51,7 @@ public class MessengerSocket extends DependenceInjectionClass {
             createSendMessageAboutException(session, "You can't whrite to this chat");
         }
         usersWebSocketSession.put((String) config.getUserProperties().get(COOKIE_FOR_WEBSOCKET), session);
-        try {
-            Map<Chats, Integer> countMessageMap = txManager.doInTransaction(() -> chatsDao.getCountNewMassages((String) config.getUserProperties().get(COOKIE_FOR_WEBSOCKET)));
-            ObjectMapper mapper = new ObjectMapper();
-            String jsonStr = mapper.writeValueAsString(countMessageMap);
-            System.out.println(jsonStr);
-            //  session.getBasicRemote().sendText(jsonStr);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (JsonMappingException e) {
-            e.printStackTrace();
-        } catch (JsonGenerationException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        sendMessageAboutCountNewMessages(session);
     }
 
     @OnClose
@@ -80,6 +67,47 @@ public class MessengerSocket extends DependenceInjectionClass {
     @OnMessage
     public void echoTextMessage(Session session, String msg) {
         parseMessageFromJson(session, msg);
+
+    }
+
+    public void sendMessageAboutCountNewMessages(Session session) {
+        try {
+            Map<Chats, Integer> countMessageMap = txManager.doInTransaction(() -> chatsDao.getCountNewMassages((String) config.getUserProperties().get(COOKIE_FOR_WEBSOCKET)));
+            ObjectMapper mapper = new ObjectMapper();
+            ObjectNode nodeBig = mapper.createObjectNode();
+            nodeBig.put("type", "newMessages");
+            ArrayNode chatArray = nodeBig.putArray("chats");
+            for (Map.Entry<Chats, Integer> pair : countMessageMap.entrySet()) {
+                ObjectNode chatNode = mapper.createObjectNode();
+                chatNode.put("chatID", pair.getKey().getIdChat());
+                chatNode.put("newMessagesCount", pair.getValue());
+                ArrayNode userArray = chatNode.putArray("users");
+                for (User user : pair.getKey().getUserList()) {
+                    ObjectNode nodeUsers = mapper.createObjectNode();
+                    nodeUsers.put("useriD", user.getId());
+                    if (user.getUuid().equals((String) config.getUserProperties().get(COOKIE_FOR_WEBSOCKET))) {
+                        nodeUsers.put("currentUser", true);
+                    } else {
+                        nodeUsers.put("currentUser", false);
+                    }
+                    userArray.add(nodeUsers);
+                }
+                chatArray.add(chatNode);
+            }
+
+            String jsonStr = nodeBig.toString();
+            // String jsonStr = mapper.writeValueAsString(countMessageMap);
+            System.out.println(jsonStr);
+            session.getBasicRemote().sendText(jsonStr);
+        } catch (SQLException e) {
+            e.printStackTrace();
+      /*  } catch (JsonMappingException e) {
+            e.printStackTrace();
+        } catch (JsonGenerationException e) {
+            e.printStackTrace();*/
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
 

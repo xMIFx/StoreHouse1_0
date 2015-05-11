@@ -20,6 +20,7 @@ websocket.onerror = function (evt) {
 function closeIt() {
     websocket.close();
 }
+
 window.onunload = closeIt;
 
 function getCookie(name) {
@@ -108,7 +109,7 @@ function parseJsonStr(str) {
         if (output.id == 'usersChat_' + json.chatID) {
             writeToScreenFromJson(json);
         }
-        addNewMessages(json.userFrom);
+        addNewMessages(json.userFrom, json.chatID);
     }
 
     else if (json.type == "Exception") {
@@ -116,6 +117,9 @@ function parseJsonStr(str) {
     }
     else if (json.type == "Chat") {
         writeAboutChat(json);
+    }
+    else if (json.type == "newMessages") {
+        writeAboutCountNewMassages(json);
     }
     else {
         writeToScreen(json.type)
@@ -168,6 +172,7 @@ function writeToScreenFromJson(messageJson) {
     }
     var newMessage = document.createElement("div");
     newMessage.classList.add('MessageClass');
+    newMessage.id = "message_" + messageJson.idMessage;
     if (messageJson.newMessage) {
         newMessage.classList.add('NewMessage');
     }
@@ -192,6 +197,25 @@ function writeToScreenFromJson(messageJson) {
     output.appendChild(newMessage);
 }
 
+function writeAboutCountNewMassages(json) {
+    var i;
+    for (i = 0; i < json.chats.length; i++) {
+        var idForChange = 'bigChat_' + json.chats[i].chatID;
+        if (document.getElementById(idForChange) == null) {
+            var j;
+            for (j = 0; j < json.chats[i].users.length; j++) {
+                if (!json.chats[i].users[j].currentUser) {
+                    idForChange = 'user_' + json.chats[i].users[j].useriD;
+                    break;
+                }
+            }
+        }
+        writeToScreenAbountCountNewMess(idForChange, parseInt(json.chats[i].newMessagesCount));
+
+    }
+
+}
+
 function functionChangingChat(UUIDUser, idUser) {
     //we need get chat id
     var elements = document.getElementsByClassName('user_ch'), el, i = 0;
@@ -214,7 +238,7 @@ function functionChangingChat(UUIDUser, idUser) {
     doSend(json);
 }
 
-function functionChangingChatByID(idChat){
+function functionChangingChatByID(idChat) {
     var elements = document.getElementsByClassName('user_ch'), el, i = 0;
     while (el = elements[i++]) {
         if (el.classList.contains('active')) {
@@ -244,12 +268,24 @@ function writeAboutChat(json) {
         removeChildrenRecursively(output);
         removeChildrenRecursively(document.getElementById('information_about_chat'));
         output.id = 'usersChat_' + json.idChat;
+        //need check if there are this chat in last
+        var valueIdForCheck = null, userTo = null, chatName = null;
+        if (json.userList.length > 2) {
+            valueIdForCheck = "lastChat_" + json.idChat;
+            chatName = json.nameChat;
+        }
         for (var i = 0; i < json.userList.length; i++) {
+            if (valueIdForCheck == null && json.userList[i].cryptUUID != cookieValue) {
+                valueIdForCheck = "lastUser_" + json.userList[i].id;
+                userTo = json.userList[i];
+                chatName = json.userList[i].name;
+            }
             var pre = document.createElement("p");
             pre.innerHTML = json.userList[i].name;
             pre.id = 'chatsUsers_' + json.userList[i].cryptUUID;
             document.getElementById('information_about_chat').appendChild(pre);
         }
+        addNewLastChat(valueIdForCheck, userTo, chatName);
         setArrayUsers();
         //sort by dateTime
         json.messagesList.sort(function (a, b) {
@@ -258,6 +294,49 @@ function writeAboutChat(json) {
         for (var j = 0; j < json.messagesList.length; j++) {
             writeToScreenFromJson(json.messagesList[j]);
         }
+        //scroll down
+        output.scrollTop = output.offsetHeight; //output.height;
+    }
+}
+
+function addNewLastChat(valueIdForCheck, userTo, chatName) {
+    if (document.getElementById(valueIdForCheck) != null) {
+        replaceLastChat(valueIdForCheck);
+
+    }
+    else {
+        addLastChat(valueIdForCheck, userTo, chatName);
+    }
+
+}
+
+function replaceLastChat(valueIdForCheck) {
+    var elementWhereReplace = document.getElementById("lastChats");
+    var elementToReplace = document.getElementById(valueIdForCheck);
+    elementWhereReplace.insertBefore(elementToReplace, elementWhereReplace.firstChild)
+
+}
+
+function addLastChat(valueIdForAdd, userTo, chatName) {
+    var elementToAppend = document.getElementById("lastChats");
+    var newLastChat = document.createElement("li");
+    newLastChat.id = valueIdForAdd;
+    newLastChat.classList.add("user_ch");
+    var newAInLastChat = document.createElement("a");
+    newAInLastChat.href = "javascript:";
+    if (userTo == null) {
+        newAInLastChat.onclick = functionChangingChatByID(valueIdForAdd.substring(valueIdForAdd.indexOf("_") + 1, valueIdForAdd.length));
+    }
+    else {
+        newAInLastChat.onclick = functionChangingChat(userTo.cryptUUID, userTo.id);
+    }
+    var newSpaninA = document.createElement("span");
+    newAInLastChat.appendChild(newSpaninA);
+    newAInLastChat.innerHTML = chatName;
+    newLastChat.appendChild(newAInLastChat);
+    elementToAppend.insertBefore(newLastChat, elementToAppend.firstChild);
+    if (elementToAppend.childNodes.length > 10) {
+        elementToAppend.removeChild(elementToAppend.lastChild);
     }
 }
 
@@ -269,29 +348,42 @@ function removeChildrenRecursively(node) {
     }
 }
 
-function addNewMessages(userFrom) {
-    var idForChange = "user_" + userFrom.id;
-    if (document.getElementById(idForChange) != null) {
-        var elements = document.getElementById(idForChange).childNodes, el, i = 0;
+function addNewMessages(userFrom, chatID) {
+    var idForChange = 'bigChat_' + chatID;
+    if (document.getElementById(idForChange) == null) {
+        idForChange = 'user_' + userFrom.id;
+    }
+    writeToScreenAbountCountNewMess(idForChange, 1);
+}
+
+function writeToScreenAbountCountNewMess(idForWrite, countNewMes) {
+    if (document.getElementById(idForWrite) != null) {
+        var elements = document.getElementById(idForWrite).childNodes, el, i = 0;
         while (el = elements[i++]) {
             if (el.classList === undefined) {
                 continue;
             }
             if (el.classList.contains("MessageCount")) {
-                el.innerHTML = (el.innerHTML === undefined || el.innerHTML == null || el.innerHTML == '') ? 1 : parseInt(el.innerHTML, 10) + 1;
+                el.innerHTML = (el.innerHTML === undefined || el.innerHTML == null || el.innerHTML == '') ? countNewMes : parseInt(el.innerHTML, 10) + countNewMes;
                 break;
             }
         }
-        var parentsBrothers = document.getElementById(idForChange).parentNode.parentNode.childNodes, element, j = 0;
+        var parentsBrothers = document.getElementById(idForWrite).parentNode.parentNode.childNodes, element, j = 0;
         while (element = parentsBrothers[j++]) {
             if (element.classList === undefined) {
                 continue;
             }
             if (element.classList.contains("MessageCount")) {
-                element.innerHTML = (element.innerHTML === undefined || element.innerHTML == null || element.innerHTML == '') ? 1 : parseInt(el.innerHTML, 10) + 1;
+                element.innerHTML = (element.innerHTML === undefined || element.innerHTML == null || element.innerHTML == '') ? countNewMes : parseInt(element.innerHTML, 10) + countNewMes;
                 break;
             }
 
         }
     }
+}
+
+function functionOnScrollChat(div) {
+    var scrolled = div.scrollTop;
+    //when scrolled =0. then need more messages
+    alert(scrolled + 'px');
 }

@@ -341,12 +341,13 @@ public class ChatDaoJdbc implements ChatDao {
     @Override
     public Map<Chats, Integer> getCountNewMassages(String userUUID) throws SQLException {
         Connection con = dataSource.getConnection();
+        Map<Integer, Chats> chatMap = new HashMap<>();
         Map<Chats, Integer> usersNewMessage = new HashMap<>();
         try (Statement st = con.createStatement();
              ResultSet resultSet = st.executeQuery("Select\n" +
                      "newMessInChat.countMes\n" +
-                     ",MAX(chatsusers.user) user\n" +
-                     ",count(distinct chatsusers.user) countUsers\n" +
+                     ",newMessInChat.chatName\n" +
+                     ",chatsusers.user userUUID\n" +
                      ",newMessInChat.idChat\n" +
                      "from\n" +
                      "(select \n" +
@@ -370,24 +371,28 @@ public class ChatDaoJdbc implements ChatDao {
                      ",chats.name) as newMessInChat\n" +
                      "inner join storehouse.chatsusers chatsusers\n" +
                      "on newMessInChat.idChat = chatsusers.idChat\n" +
-                     "where chatsusers.user <> '" + userUUID + "'\n" +
+                     //"where chatsusers.user <> '" + userUUID + "'\n" +
                      "group by\n" +
                      "newMessInChat.countMes\n" +
+                     ",newMessInChat.chatName\n" +
+                     ",chatsusers.user\n" +
                      ",newMessInChat.idChat;\n")) {
 
             while (resultSet.next()) {
                 Chats chat = null;
-                User userTwo = UserConstant.getUserConst().getAllUser().get(resultSet.getString("user"));
-                chat = new Chats();
-                chat.addUser(UserConstant.getUserConst().getAllUser().get(userUUID));
-                chat.addUser(userTwo);
-                if (resultSet.getInt("countUsers") == 1) {
-                    chat.setNameChat(userTwo.login);
+                if (chatMap.containsKey(resultSet.getInt("idChat"))) {
+                    chat = chatMap.get(resultSet.getInt("idChat"));
                 } else {
-                    chat.setNameChat(resultSet.getString("nameChat"));
+
+                    chat = new Chats();
+                    chat.setIdChat(resultSet.getInt("idChat"));
+                    chat.setNameChat(resultSet.getString("chatName"));
+                    chatMap.put(chat.getIdChat(),chat);
                 }
-                chat.setIdChat(resultSet.getInt("idChat"));
-                usersNewMessage.put(chat, resultSet.getInt("countMes"));
+                chat.addUser(UserConstant.getUserConst().getAllUser().get(resultSet.getString("userUUID")));
+                if (!usersNewMessage.containsKey(chat)) {
+                    usersNewMessage.put(chat, resultSet.getInt("countMes"));
+                }
             }
         }
         return usersNewMessage;
