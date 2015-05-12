@@ -11,6 +11,7 @@ public class Chats {
     private String nameChat;
     private Set<User> userList;
     private Set<Messages> messagesList;
+    private boolean isThereSomeMoreMessages;
     private final String type = "Chat"; //for json
 
     public Chats() {
@@ -49,6 +50,14 @@ public class Chats {
 
     public void setIdChat(int idChat) {
         this.idChat = idChat;
+    }
+
+    public boolean isThereSomeMoreMessages() {
+        return isThereSomeMoreMessages;
+    }
+
+    public void setIsThereSomeMoreMessages(boolean isThereSomeMoreMessages) {
+        this.isThereSomeMoreMessages = isThereSomeMoreMessages;
     }
 
     public Set<User> getUserList() {

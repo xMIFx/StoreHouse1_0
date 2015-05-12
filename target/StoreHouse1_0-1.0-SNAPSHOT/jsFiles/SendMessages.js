@@ -3,6 +3,13 @@
  */
 
 var output;
+var informationAboutMessagesInChat = {
+    numbersMessagesInChat: 0,
+    thereAreAnyMessages: true,
+    howMuchMessagesWeNeedAfterScroll:15,
+    howMuchScrollWas:0,
+    minDateInChat: new Date().getTime()
+}
 var arrayUsers = [];
 var cookieValue = getCookie('chat');
 var wsUri = "ws://" + document.location.host + document.location.pathname + "/chat";
@@ -170,31 +177,37 @@ function writeToScreenFromJson(messageJson) {
     if (output === undefined) {
         setOutput();
     }
-    var newMessage = document.createElement("div");
-    newMessage.classList.add('MessageClass');
-    newMessage.id = "message_" + messageJson.idMessage;
-    if (messageJson.newMessage) {
-        newMessage.classList.add('NewMessage');
-    }
-    if (cookieValue == messageJson.userFrom.cryptUUID) {
-        newMessage.classList.add('MyMessage');
-    }
+    if (document.getElementById("message_" + messageJson.idMessage) == null) {
+        var newMessage = document.createElement("div");
+        newMessage.classList.add('MessageClass');
+        newMessage.id = "message_" + messageJson.idMessage;
+        if (messageJson.newMessage) {
+            newMessage.classList.add('NewMessage');
+        }
+        if (cookieValue == messageJson.userFrom.cryptUUID) {
+            newMessage.classList.add('MyMessage');
+        }
 
-    //from
-    var options = {
-        weekday: "long", year: "numeric", month: "short", hour12: false,
-        day: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit"
-    };
-    var whoWright = document.createElement("p");
-    whoWright.innerHTML = messageJson.userFrom.login + " " + (new Date(messageJson.dateMessage)).toLocaleTimeString(navigator.language, options);
-    whoWright.classList.add('WhoWright');
-    //message
-    var pre = document.createElement("p");
-    pre.innerHTML = messageJson.message;
-    pre.classList.add('MessageText');
-    newMessage.appendChild(whoWright);
-    newMessage.appendChild(pre);
-    output.appendChild(newMessage);
+        //from
+        var options = {
+            weekday: "long", year: "numeric", month: "short", hour12: false,
+            day: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit"
+        };
+        var whoWright = document.createElement("p");
+        whoWright.innerHTML = messageJson.userFrom.login + " " + (new Date(messageJson.dateMessage)).toLocaleTimeString(navigator.language, options);
+        whoWright.classList.add('WhoWright');
+        //message
+        var pre = document.createElement("p");
+        pre.innerHTML = messageJson.message;
+        pre.classList.add('MessageText');
+        newMessage.appendChild(whoWright);
+        newMessage.appendChild(pre);
+        output.appendChild(newMessage);
+        if (informationAboutMessagesInChat.minDateInChat > messageJson.dateMessage) {
+            informationAboutMessagesInChat.minDateInChat = messageJson.dateMessage;
+        }
+        informationAboutMessagesInChat.numbersMessagesInChat ++;
+    }
 }
 
 function writeAboutCountNewMassages(json) {
@@ -265,6 +278,8 @@ function writeAboutChat(json) {
     }
 
     if (output.id != 'usersChat_' + json.idChat) {
+        informationAboutMessagesInChat.thereAreAnyMessages = json.thereSomeMoreMessages;
+
         removeChildrenRecursively(output);
         removeChildrenRecursively(document.getElementById('information_about_chat'));
         output.id = 'usersChat_' + json.idChat;
@@ -385,5 +400,17 @@ function writeToScreenAbountCountNewMess(idForWrite, countNewMes) {
 function functionOnScrollChat(div) {
     var scrolled = div.scrollTop;
     //when scrolled =0. then need more messages
-    alert(scrolled + 'px');
+    if (scrolled == 0 && informationAboutMessagesInChat.thereAreAnyMessages) {
+        informationAboutMessagesInChat.howMuchScrollWas++;
+        if(informationAboutMessagesInChat.howMuchScrollWas>2 && informationAboutMessagesInChat.howMuchScrollWas<5){
+            informationAboutMessagesInChat.howMuchMessagesWeNeedAfterScroll = 25;
+        }
+        else if(informationAboutMessagesInChat.howMuchScrollWas>=5 && informationAboutMessagesInChat.howMuchScrollWas<8){
+            informationAboutMessagesInChat.howMuchMessagesWeNeedAfterScroll = 35;
+        }
+        else if(informationAboutMessagesInChat.howMuchScrollWas>=8){
+            informationAboutMessagesInChat.howMuchMessagesWeNeedAfterScroll = 50;
+        }
+        alert("need more");
+    }
 }

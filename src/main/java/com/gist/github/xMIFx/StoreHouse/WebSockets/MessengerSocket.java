@@ -138,7 +138,7 @@ public class MessengerSocket extends DependenceInjectionClass {
         } else if (myMap != null && myMap.get("type").equals("bigChat")) {
             try {
                 int chatID = Integer.valueOf(myMap.get("userTo"));
-                Chats chat = txManager.doInTransaction(() -> chatsDao.getChatByID(chatID));
+                Chats chat = txManager.doInTransaction(() -> chatsDao.getChatByID(chatID,(String) config.getUserProperties().get(COOKIE_FOR_WEBSOCKET)));
                 if (chat.getUserList().contains(UserConstant.getUserConst().getAllUser().get((String) config.getUserProperties().get(COOKIE_FOR_WEBSOCKET)))) {
                     sendMessageAboutChat(session, chat);
                 } else {

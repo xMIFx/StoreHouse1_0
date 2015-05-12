@@ -65,6 +65,7 @@ public class Messages {
     private int chatID;
     private String message;
     private boolean newMessage;
+    private boolean markForDelete;
     private Date dateMessage;
     private Set<UsersTo> usersTo;
     private final String type = "Messages"; //for json
@@ -140,6 +141,14 @@ public class Messages {
 
     public void setDateMessage(Date dateMessage) {
         this.dateMessage = dateMessage;
+    }
+
+    public boolean isMarkForDelete() {
+        return markForDelete;
+    }
+
+    public void setMarkForDelete(boolean markForDelete) {
+        this.markForDelete = markForDelete;
     }
 
     @JsonIgnore

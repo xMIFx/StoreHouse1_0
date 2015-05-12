@@ -56,38 +56,82 @@ public class ChatDaoJdbc implements ChatDao {
     }
 
     @Override
-    public Chats getChatByID(int chatID) throws SQLException {
+    public Chats getChatByID(int chatID, String currentUser) throws SQLException {
         Chats chat = null;
+        int allMessagesCount = 0;
+        int countMessage = 0;
         Connection con = dataSource.getConnection();
         Map<Integer, Messages> messagesMap = new HashMap<>();
-        Map<String, User> userMap = new HashMap<>();
+        /*Map<String, User> userMap = new HashMap<>();*/
         try (Statement st = con.createStatement();
-             ResultSet resultSet = st.executeQuery("select\n" +
-                     "chats.id idChat\n" +
+             ResultSet resultSet = st.executeQuery("Select\n" +
+                     "allMessagesInChat.idMessage\n" +
+                     ",allMessagesInChat.idChat\n" +
                      ",chats.name nameChat\n" +
-                     ",messages.UserFrom\n" +
-                     ",iFNull(messages.id,0) idMessage\n" +
-                     ",messages.message\n" +
-                     ",messages.dateMessage\n" +
-                     ",messagestouser.userUUID userToUUID\n" +
-                     ",iFNull(messagestouser.newMes,0) newMessage\n" +
-                     ",iFNull(messagestouser.markToDelete,1) markToDelete\n" +
+                     ",allMessagesInChat.message\n" +
+                     ",allMessagesInChat.UserFrom\n" +
+                     ",allMessagesInChat.dateMessage\n" +
+                     ",messagestouser.userUUID userUUIDTo\n" +
+                     ",messagestouser.newMes\n" +
+                     ",messagestouser.markToDelete\n" +
+                     ",allMessageCountTable.countAllMess\n" +
                      "from\n" +
-                     "storehouse.chats chats\n" +
-                     "inner join storehouse.messages messages\n" +
-                     "on chats.id =  messages.idChat\n" +
-                     "and messages.idChat = " + chatID + "\n" +
-                     "inner join storehouse.messagestouser messagestouser\n" +
-                     "on messages.id = messagestouser.idmessage\n" +
-                     "and messages.idChat=" + chatID + "\n" +
-                     "where iFNull(messagestouser.markToDelete,1)=0\n" +
-                     "and not messagestouser.userUUID is null\n" +
-                     "order by messages.dateMessage\n" +
-                     "LIMIT 15;")) {
+                     "(select\n" +
+                     "messages.id idMessage\n" +
+                     ",messages.idChat\n" +
+                     ",messages.message\n" +
+                     ",messages.UserFrom\n" +
+                     ",messages.dateMessage\n" +
+                     ",messagestouser.userUUID UserToUUID\n" +
+                     ",case When messagestouser.userUUID is null then\n" +
+                     "messages.markForDeleteUserFrom\n" +
+                     "else\n" +
+                     "messagestouser.markToDelete\n" +
+                     "end deletemark\n" +
+                     "from\n" +
+                     "storehouse.messages messages\n" +
+                     "left join storehouse.messagestouser messagestouser\n" +
+                     "on messagestouser.userUUID = '"+currentUser+"'\n" +
+                     "and messages.id = messagestouser.idmessage\n" +
+                     "where idChat ="+chatID+" \n" +
+                     "and case When messagestouser.userUUID is null then\n" +
+                     "messages.markForDeleteUserFrom\n" +
+                     "else\n" +
+                     "messagestouser.markToDelete\n" +
+                     "end =0\n" +
+                     "order by messages.dateMessage DESC\n" +
+                     "LIMIT 15) as allMessagesInChat\n" +
+                     "inner join storehouse.chats chats\n" +
+                     "on chats.id = allMessagesInChat.idChat\n" +
+                     "left join storehouse.messagestouser messagestouser\n" +
+                     "on allMessagesInChat.idMessage = messagestouser.idmessage\n" +
+                     "left join (select\n" +
+                     "count(distinct m.id) countAllMess\n" +
+                     ",m.idChat\n" +
+                     ",case When messagestouser.userUUID is null then\n" +
+                     "m.markForDeleteUserFrom\n" +
+                     "else\n" +
+                     "messagestouser.markToDelete\n" +
+                     "end deletemark\n" +
+                     "from\n" +
+                     "storehouse.messages m\n" +
+                     "left join storehouse.messagestouser messagestouser\n" +
+                     "on messagestouser.userUUID = '"+currentUser+"'\n" +
+                     "and m.id = messagestouser.idmessage\n" +
+                     "where m.idChat ="+chatID+"\n" +
+                     "and case When messagestouser.userUUID is null then\n" +
+                     "m.markForDeleteUserFrom\n" +
+                     "else\n" +
+                     "messagestouser.markToDelete\n" +
+                     "end =0\n" +
+                     "group by m.idChat) as allMessageCountTable\n" +
+                     "on allMessagesInChat.idChat = allMessageCountTable.idChat);")) {
 
 
             while (resultSet.next()) {
-
+                if (allMessagesCount == 0) {
+                    allMessagesCount = resultSet.getInt("countAllMess");
+                }
                 if (chat == null) {
                     chat = new Chats();
                     chat.setNameChat(resultSet.getString("nameChat"));
@@ -106,24 +150,31 @@ public class ChatDaoJdbc implements ChatDao {
                                 , resultSet.getString("message")
                                 , resultSet.getBoolean("newMessage")
                                 , new Date(resultSet.getTimestamp("dateMessage").getTime()));
+                        message.setMarkForDelete(resultSet.getBoolean("markForDeleteUserFrom"));
                         messagesMap.put(message.getIdMessage(), message);
                         itNewMes = true;
                     }
                     message.addUserTo(resultSet.getString("userToUUID"), resultSet.getBoolean("newMessage"), resultSet.getBoolean("markToDelete"));
                     if (itNewMes) {
                         chat.addMessage(message);
+                        countMessage++;
                     }
                 }
-                if (userMap.containsKey(resultSet.getString("userToUUID"))) {/*NOP*/} else {
-                    User user = UserConstant.getUserConst().getAllUser().get(resultSet.getString("userToUUID"));
+               /* if (userMap.containsKey(resultSet.getString("userFromChat"))) {*//*NOP*//*} else {
+                    User user = UserConstant.getUserConst().getAllUser().get(resultSet.getString("userFromChat"));
                     userMap.put(user.getUuid(), user);
                     chat.addUser(user);
                 }
-                if (userMap.containsKey(resultSet.getString("UserFrom"))) {/*NOP*/} else {
+                if (userMap.containsKey(resultSet.getString("UserFrom"))) {*//*NOP*//*} else {
                     User user = UserConstant.getUserConst().getAllUser().get(resultSet.getString("UserFrom"));
                     userMap.put(user.getUuid(), user);
                     chat.addUser(user);
-                }
+                }*/
+            }
+            chat.setIsThereSomeMoreMessages((allMessagesCount > countMessage) ? true : false);
+            List<String> usersFromChat = getUsersFromChat(chat.getIdChat());
+            for (String userFromChat: usersFromChat){
+                chat.addUser(UserConstant.getUserConst().getAllUser().get(userFromChat));
             }
         }
 
@@ -158,53 +209,239 @@ public class ChatDaoJdbc implements ChatDao {
     }
 
     @Override
-    public Chats getChatBetweenUsers(String user1, String user2) throws SQLException {
+    public Chats getMoreMessagesInChat(int chatID, int countMessageAlreadyInChat, Date minDateInChat, int howMuchNeed, String currentUser) throws SQLException {
         Chats chat = null;
+        int allMessagesCount = 0;
+        int countMessage = 0;
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Connection con = dataSource.getConnection();
+        Map<Integer, Messages> messagesMap = new HashMap<>();
+       /* Map<String, User> userMap = new HashMap<>();*/
+        try (Statement st = con.createStatement();
+             ResultSet resultSet = st.executeQuery("Select\n" +
+                     "allMessagesInChat.idMessage\n" +
+                     ",allMessagesInChat.idChat\n" +
+                     ",chats.name nameChat\n" +
+                     ",allMessagesInChat.message\n" +
+                     ",allMessagesInChat.UserFrom\n" +
+                     ",allMessagesInChat.markForDeleteUserFrom\n" +
+                     ",allMessagesInChat.dateMessage\n" +
+                     ",messagestouser.userUUID userToUUID\n" +
+                     ",ifNULL(messagestouser.newMes,0) newMessage\n" +
+                     ",messagestouser.markToDelete\n" +
+                     ",allMessageCountTable.countAllMess\n" +
+                     "from\n" +
+                     "(select\n" +
+                     "messages.id idMessage\n" +
+                     ",messages.idChat\n" +
+                     ",messages.message\n" +
+                     ",messages.UserFrom\n" +
+                     ",messages.markForDeleteUserFrom\n" +
+                     ",messages.dateMessage\n" +
+                     ",messagestouser.userUUID UserToUUID\n" +
+                     ",case When messagestouser.userUUID is null then\n" +
+                     "messages.markForDeleteUserFrom\n" +
+                     "else\n" +
+                     "messagestouser.markToDelete\n" +
+                     "end deletemark\n" +
+                     "from\n" +
+                     "storehouse.messages messages\n" +
+                     "left join storehouse.messagestouser messagestouser\n" +
+                     "on messagestouser.userUUID = '" + currentUser + "'\n" +
+                     "and messages.id = messagestouser.idmessage\n" +
+                     "where idChat =" + chatID + " \n" +
+                     "and messages.dateMessage <= '"+dateFormat.format(minDateInChat)+"' \n" +
+                     "and case When messagestouser.userUUID is null then\n" +
+                     "messages.markForDeleteUserFrom\n" +
+                     "else\n" +
+                     "messagestouser.markToDelete\n" +
+                     "end =0\n" +
+                     "order by messages.dateMessage DESC\n" +
+                     "LIMIT "+howMuchNeed+") as allMessagesInChat\n" +
+                     "inner join storehouse.chats chats\n" +
+                     "on chats.id = allMessagesInChat.idChat\n" +
+                     "left join storehouse.messagestouser messagestouser\n" +
+                     "on allMessagesInChat.idMessage = messagestouser.idmessage\n" +
+                     "left join (\n" +
+                     "select\n" +
+                     "count(distinct m.id) countAllMess\n" +
+                     ",m.idChat\n" +
+                     ",case When messagestouser.userUUID is null then\n" +
+                     "m.markForDeleteUserFrom\n" +
+                     "else\n" +
+                     "messagestouser.markToDelete\n" +
+                     "end deletemark\n" +
+                     "from\n" +
+                     "storehouse.messages m\n" +
+                     "left join storehouse.messagestouser messagestouser\n" +
+                     "on messagestouser.userUUID = '"+currentUser+"'\n" +
+                     "and m.id = messagestouser.idmessage\n" +
+                     "where m.idChat ="+chatID+" \n" +
+                     "and case When messagestouser.userUUID is null then\n" +
+                     "m.markForDeleteUserFrom\n" +
+                     "else\n" +
+                     "messagestouser.markToDelete\n" +
+                     "end =0\n" +
+                     "group by m.idChat) as allMessageCountTable\n" +
+                     "on allMessagesInChat.idChat = allMessageCountTable.idChat;")) {
+
+
+            while (resultSet.next()) {
+                if (allMessagesCount == 0) {
+                    allMessagesCount = resultSet.getInt("countAllMess");
+                }
+                if (chat == null) {
+                    chat = new Chats();
+                    chat.setNameChat(resultSet.getString("nameChat"));
+                    chat.setIdChat(resultSet.getInt("idChat"));
+                }
+                if (resultSet.getInt("idMessage") != 0) {
+                    boolean itNewMes = false;
+                    Messages message = null;
+                    if (messagesMap.containsKey(resultSet.getInt("idMessage"))) {
+                        message = messagesMap.get(resultSet.getInt("idMessage"));
+
+                    } else {
+                        message = new Messages(UserConstant.getUserConst().getAllUser().get(resultSet.getString("UserFrom"))
+                                , resultSet.getInt("idChat")
+                                , resultSet.getInt("idMessage")
+                                , resultSet.getString("message")
+                                , resultSet.getBoolean("newMessage")
+                                , new Date(resultSet.getTimestamp("dateMessage").getTime()));
+                        message.setMarkForDelete(resultSet.getBoolean("markForDeleteUserFrom"));
+                        messagesMap.put(message.getIdMessage(), message);
+                        itNewMes = true;
+                    }
+                    message.addUserTo(resultSet.getString("userToUUID"), resultSet.getBoolean("newMessage"), resultSet.getBoolean("markToDelete"));
+                    if (itNewMes) {
+                        chat.addMessage(message);
+                        countMessage++;
+                    }
+                }
+                /*if (userMap.containsKey(resultSet.getString("userToUUID"))) {*//*NOP*//*} else {
+                    User user = UserConstant.getUserConst().getAllUser().get(resultSet.getString("userToUUID"));
+                    userMap.put(user.getUuid(), user);
+                    chat.addUser(user);
+                }
+                if (userMap.containsKey(resultSet.getString("UserFrom"))) {*//*NOP*//*} else {
+                    User user = UserConstant.getUserConst().getAllUser().get(resultSet.getString("UserFrom"));
+                    userMap.put(user.getUuid(), user);
+                    chat.addUser(user);
+                }*/
+            }
+            chat.setIsThereSomeMoreMessages((allMessagesCount > (countMessage+countMessageAlreadyInChat)) ? true : false);
+            List<String> usersFromChat = getUsersFromChat(chat.getIdChat());
+            for (String userFromChat: usersFromChat){
+                chat.addUser(UserConstant.getUserConst().getAllUser().get(userFromChat));
+            }
+        }
+
+        return chat;
+    }
+
+    @Override
+    public Chats getChatBetweenUsers(String currentUser, String user2) throws SQLException {
+        Chats chat = null;
+        int allMessagesCount = 0;
+        int countMessage = 0;
         Connection con = dataSource.getConnection();
         Map<Integer, Messages> messagesMap = new HashMap<>();
         try (Statement st = con.createStatement();
-             ResultSet resultSet = st.executeQuery("select\n" +
-                     "selectedChat.idChat\n" +
+             ResultSet resultSet = st.executeQuery("Select\n" +
+                     "allMessagesInChat.idMessage\n" +
+                     ",allMessagesInChat.idChat\n" +
                      ",chats.name nameChat\n" +
-                     ",messages.UserFrom\n" +
-                     ",iFNull(messages.id,0) idMessage\n" +
-                     ",messages.message\n" +
-                     ",messages.dateMessage\n" +
+                     ",allMessagesInChat.message\n" +
+                     ",allMessagesInChat.UserFrom\n" +
+                     ",allMessagesInChat.dateMessage\n" +
                      ",messagestouser.userUUID userToUUID\n" +
-                     ",iFNull(messagestouser.newMes,0) newMessage\n" +
-                     ",iFNull(messagestouser.markToDelete,1) markToDelete\n" +
+                     ",ifNULL(messagestouser.newMes,0) newMessage\n" +
+                     ",messagestouser.markToDelete\n" +
+                     ",allMessageCountTable.countAllMess\n" +
                      "from\n" +
-                     "(SELECT \n" +
+                     "(select\n" +
+                     "messages.id idMessage\n" +
+                     ",messages.idChat\n" +
+                     ",messages.message\n" +
+                     ",messages.UserFrom\n" +
+                     ",messages.dateMessage\n" +
+                     ",messagestouser.userUUID UserToUUID\n" +
+                     ",case When messagestouser.userUUID is null then\n" +
+                     "messages.markForDeleteUserFrom\n" +
+                     "else\n" +
+                     "messagestouser.markToDelete\n" +
+                     "end deletemark\n" +
+                     "from\n" +
+                     "storehouse.messages messages\n" +
+                     "left join storehouse.messagestouser messagestouser\n" +
+                     "on messagestouser.userUUID = '"+currentUser+"'\n" +
+                     "and messages.id = messagestouser.idmessage\n" +
+                     "where idChat in (SELECT \n" +
                      "chatsusers.idChat\n" +
-                     ",count(distinct chatsusers.user) countUser \n" +
                      "FROM storehouse.chatsusers chatsusers\n" +
                      "where chatsusers.idChat in (\n" +
                      "SELECT \n" +
                      "chatsusers.idChat\n" +
                      "FROM storehouse.chatsusers chatsusers\n" +
-                     "Where chatsusers.user = '" + user1 + "'\n" +
-                     "  or chatsusers.user = '" + user2 + "'\n" +
-                     "  group by chatsusers.idChat\n" +
+                     "Where chatsusers.user = '"+user2+"'\n" +
+                     "or chatsusers.user = '"+currentUser+"'\n" +
+                     "group by chatsusers.idChat\n" +
                      "having count(distinct chatsusers.user)=2)\n" +
                      "group by chatsusers.idChat\n" +
-                     "having count(distinct chatsusers.user)=2) as selectedChat\n" +
+                     "having count(distinct chatsusers.user)=2) \n" +
+                     "and case When messagestouser.userUUID is null then\n" +
+                     "messages.markForDeleteUserFrom\n" +
+                     "else\n" +
+                     "messagestouser.markToDelete\n" +
+                     "end =0\n" +
+                     "order by messages.dateMessage DESC\n" +
+                     "LIMIT 15) as allMessagesInChat\n" +
                      "inner join storehouse.chats chats\n" +
-                     "on selectedChat.idChat = chats.id\n" +
-                     "left join storehouse.messages messages\n" +
-                     "on selectedChat.idChat =  messages.idChat\n" +
+                     "on chats.id = allMessagesInChat.idChat\n" +
                      "left join storehouse.messagestouser messagestouser\n" +
-                     "on messages.id = messagestouser.idmessage\n" +
-                     "where iFNull(messagestouser.markToDelete,1)=0\n" +
-                     "and not messagestouser.userUUID is null\n" +
-                     "order by messages.dateMessage\n" +
-                     "LIMIT 15;")) {
+                     "on allMessagesInChat.idMessage = messagestouser.idmessage\n" +
+                     "left join (select\n" +
+                     "count(distinct m.id) countAllMess\n" +
+                     ",m.idChat\n" +
+                     ",case When messagestouser.userUUID is null then\n" +
+                     "m.markForDeleteUserFrom\n" +
+                     "else\n" +
+                     "messagestouser.markToDelete\n" +
+                     "end deletemark\n" +
+                     "from\n" +
+                     "storehouse.messages m\n" +
+                     "left join storehouse.messagestouser messagestouser\n" +
+                     "on messagestouser.userUUID = '"+currentUser+"'\n" +
+                     "and m.id = messagestouser.idmessage\n" +
+                     "where m.idChat in (SELECT \n" +
+                     "chatsusers.idChat\n" +
+                     "FROM storehouse.chatsusers chatsusers\n" +
+                     "where chatsusers.idChat in (\n" +
+                     "SELECT \n" +
+                     "chatsusers.idChat\n" +
+                     "FROM storehouse.chatsusers chatsusers\n" +
+                     "Where chatsusers.user = '"+currentUser+"'\n" +
+                     "or chatsusers.user = '"+user2+"'\n" +
+                     "group by chatsusers.idChat\n" +
+                     "having count(distinct chatsusers.user)=2)\n" +
+                     "group by chatsusers.idChat\n" +
+                     "having count(distinct chatsusers.user)=2) \n" +
+                     "and case When messagestouser.userUUID is null then\n" +
+                     "m.markForDeleteUserFrom\n" +
+                     "else\n" +
+                     "messagestouser.markToDelete\n" +
+                     "end =0\n" +
+                     "group by m.idChat) as allMessageCountTable\n" +
+                     "on allMessagesInChat.idChat = allMessageCountTable.idChat;")) {
 
 
             while (resultSet.next()) {
-
+                if (allMessagesCount == 0) {
+                    allMessagesCount = resultSet.getInt("countAllMess");
+                }
                 if (chat == null) {
                     chat = new Chats();
-                    chat.addUser(UserConstant.getUserConst().getAllUser().get(user1));
+                    chat.addUser(UserConstant.getUserConst().getAllUser().get(currentUser));
                     chat.addUser(UserConstant.getUserConst().getAllUser().get(user2));
                     chat.setNameChat(resultSet.getString("nameChat"));
                     chat.setIdChat(resultSet.getInt("idChat"));
@@ -228,20 +465,19 @@ public class ChatDaoJdbc implements ChatDao {
                     message.addUserTo(resultSet.getString("userToUUID"), resultSet.getBoolean("newMessage"), resultSet.getBoolean("markToDelete"));
                     if (itNewMes) {
                         chat.addMessage(message);
+                        countMessage++;
                     }
                 }
 
             }
             if (chat == null) {
                 chat = new Chats();
-                chat.addUser(UserConstant.getUserConst().getAllUser().get(user1));
+                chat.addUser(UserConstant.getUserConst().getAllUser().get(currentUser));
                 chat.addUser(UserConstant.getUserConst().getAllUser().get(user2));
                 chat.setNameChat("BetweenUsers");
                 chat.setIdChat(saveNewChat(chat));
             }
-            ;
-
-
+            chat.setIsThereSomeMoreMessages((allMessagesCount > countMessage) ? true : false);
         }
 
         return chat;
@@ -311,7 +547,7 @@ public class ChatDaoJdbc implements ChatDao {
                      "group by\n" +
                      "messages.idChat\n" +
                      ",chats.name\n" +
-                     "order by dateMessage\n" +
+                     "order by dateMessage DESC\n" +
                      "limit 10) as lastChats\n" +
                      "inner join storehouse.chatsusers chatsusers\n" +
                      "on lastChats.idChat = chatsusers.idChat\n" +
@@ -387,7 +623,7 @@ public class ChatDaoJdbc implements ChatDao {
                     chat = new Chats();
                     chat.setIdChat(resultSet.getInt("idChat"));
                     chat.setNameChat(resultSet.getString("chatName"));
-                    chatMap.put(chat.getIdChat(),chat);
+                    chatMap.put(chat.getIdChat(), chat);
                 }
                 chat.addUser(UserConstant.getUserConst().getAllUser().get(resultSet.getString("userUUID")));
                 if (!usersNewMessage.containsKey(chat)) {
