@@ -6,8 +6,8 @@ var output;
 var informationAboutMessagesInChat = {
     numbersMessagesInChat: 0,
     thereAreAnyMessages: true,
-    howMuchMessagesWeNeedAfterScroll:15,
-    howMuchScrollWas:0,
+    howMuchMessagesWeNeedAfterScroll: 15,
+    howMuchScrollWas: 0,
     minDateInChat: new Date().getTime()
 }
 var arrayUsers = [];
@@ -52,20 +52,29 @@ function send_message() {
     }
 }
 
-function setArrayUsers() {
-    var elementsUsersChat = document.getElementById('information_about_chat').childNodes, strId, elUser, j = 0;
-    var reUs = new RegExp('chatsUsers', 'g');
-    while (elUser = elementsUsersChat[j++]) {
-        strId = elUser.id;
-        if (strId === undefined) {
-            continue;
-        }
-        else if (strId.match(reUs)) {
-            arrayUsers.push(strId.substring(11, strId.length));//11 = 'chatsUsers'.length+1
-        }
-
+function addToArrayUsers(jsonUser) {
+    var user = {
+        userName: jsonUser.name,
+        userLogin: jsonUser.login,
+        userUUID: jsonUser.cryptUUID
     }
+    arrayUsers.push(user);
 }
+
+/*function setArrayUsers() {
+ var elementsUsersChat = document.getElementById('information_about_chat').childNodes, strId, elUser, j = 0;
+ var reUs = new RegExp('chatsUsers', 'g');
+ while (elUser = elementsUsersChat[j++]) {
+ strId = elUser.id;
+ if (strId === undefined) {
+ continue;
+ }
+ else if (strId.match(reUs)) {
+ arrayUsers.push(strId.substring(11, strId.length));//11 = 'chatsUsers'.length+1
+ }
+
+ }
+ }*/
 
 function setOutput() {
     var elements = document.getElementById("output_box").childNodes, i = 0, el;
@@ -80,7 +89,7 @@ function setOutput() {
             break;
         }
     }
-    setArrayUsers();
+    // setArrayUsers();
 }
 
 function initOutput() {
@@ -114,9 +123,11 @@ function parseJsonStr(str) {
     }
     else if (json.type == "Messages") {
         if (output.id == 'usersChat_' + json.chatID) {
-            writeToScreenFromJson(json);
+            writeToScreenMessageFromJson(json, false);
         }
-        addNewMessages(json.userFrom, json.chatID);
+        if (cookieValue != json.userFrom.cryptUUID) {
+            addNewMessages(json.userFrom, json.chatID);
+        }
     }
 
     else if (json.type == "Exception") {
@@ -173,7 +184,7 @@ function writeToScreen(message) {
     output.appendChild(pre);
 }
 
-function writeToScreenFromJson(messageJson) {
+function writeToScreenMessageFromJson(messageJson, beggining) {
     if (output === undefined) {
         setOutput();
     }
@@ -194,19 +205,35 @@ function writeToScreenFromJson(messageJson) {
             day: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit"
         };
         var whoWright = document.createElement("p");
-        whoWright.innerHTML = messageJson.userFrom.login + " " + (new Date(messageJson.dateMessage)).toLocaleTimeString(navigator.language, options);
+        whoWright.innerHTML = messageJson.userFrom.name + " " + (new Date(messageJson.dateMessage)).toLocaleTimeString(navigator.language, options);
         whoWright.classList.add('WhoWright');
+        newMessage.appendChild(whoWright);
+        //who don't read
+        if (messageJson.usersWhichDontRead.length > 0) {
+            var whoDoesntRead = document.createElement("p");
+            whoDoesntRead.classList.add('WhoDontRead');
+            whoDoesntRead.innerHTML = "Doesn't read: "+messageJson.usersWhichDontRead[0].login;
+            for (var j = 1; j < messageJson.usersWhichDontRead.length; j++) {
+                whoDoesntRead.innerHTML =  whoDoesntRead.innerHTML+"; "+messageJson.usersWhichDontRead[j].login;
+           }
+            newMessage.appendChild(whoDoesntRead);
+        }
         //message
         var pre = document.createElement("p");
         pre.innerHTML = messageJson.message;
         pre.classList.add('MessageText');
-        newMessage.appendChild(whoWright);
         newMessage.appendChild(pre);
-        output.appendChild(newMessage);
+        if (beggining) {
+            output.insertBefore(newMessage, output.firstChild)
+        }
+        else {
+            output.appendChild(newMessage);
+            output.scrollTop = output.scrollHeight;
+        }
         if (informationAboutMessagesInChat.minDateInChat > messageJson.dateMessage) {
             informationAboutMessagesInChat.minDateInChat = messageJson.dateMessage;
         }
-        informationAboutMessagesInChat.numbersMessagesInChat ++;
+        informationAboutMessagesInChat.numbersMessagesInChat++;
     }
 }
 
@@ -245,6 +272,7 @@ function functionChangingChat(UUIDUser, idUser) {
     var json = JSON.stringify({
             "type": "Chat",
             "operation": "gettingChatID",
+            "userFrom": cookieValue,
             "userTo": UUIDUser
         }
     );
@@ -266,7 +294,8 @@ function functionChangingChatByID(idChat) {
     var json = JSON.stringify({
             "type": "bigChat",
             "operation": "gettingChatID",
-            "userTo": idChat
+            "userFrom": cookieValue,
+            "chatID": idChat
         }
     );
     doSend(json);
@@ -299,18 +328,26 @@ function writeAboutChat(json) {
             pre.innerHTML = json.userList[i].name;
             pre.id = 'chatsUsers_' + json.userList[i].cryptUUID;
             document.getElementById('information_about_chat').appendChild(pre);
+            addToArrayUsers(json.userList[i]);
         }
         addNewLastChat(valueIdForCheck, userTo, chatName);
-        setArrayUsers();
+
         //sort by dateTime
         json.messagesList.sort(function (a, b) {
             return a.dateMessage - b.dateMessage;
         });
         for (var j = 0; j < json.messagesList.length; j++) {
-            writeToScreenFromJson(json.messagesList[j]);
+            writeToScreenMessageFromJson(json.messagesList[j], false);
         }
         //scroll down
-        output.scrollTop = output.offsetHeight; //output.height;
+        // in messageWriter output.scrollTop = output.offsetHeight; //output.height;
+    } else if (output.id == 'usersChat_' + json.idChat) {
+        json.messagesList.sort(function (a, b) {
+            return b.dateMessage - a.dateMessage;
+        });
+        for (var j = 0; j < json.messagesList.length; j++) {
+            writeToScreenMessageFromJson(json.messagesList[j], true);
+        }
     }
 }
 
@@ -402,15 +439,26 @@ function functionOnScrollChat(div) {
     //when scrolled =0. then need more messages
     if (scrolled == 0 && informationAboutMessagesInChat.thereAreAnyMessages) {
         informationAboutMessagesInChat.howMuchScrollWas++;
-        if(informationAboutMessagesInChat.howMuchScrollWas>2 && informationAboutMessagesInChat.howMuchScrollWas<5){
+        if (informationAboutMessagesInChat.howMuchScrollWas > 2 && informationAboutMessagesInChat.howMuchScrollWas < 5) {
             informationAboutMessagesInChat.howMuchMessagesWeNeedAfterScroll = 25;
         }
-        else if(informationAboutMessagesInChat.howMuchScrollWas>=5 && informationAboutMessagesInChat.howMuchScrollWas<8){
+        else if (informationAboutMessagesInChat.howMuchScrollWas >= 5 && informationAboutMessagesInChat.howMuchScrollWas < 8) {
             informationAboutMessagesInChat.howMuchMessagesWeNeedAfterScroll = 35;
         }
-        else if(informationAboutMessagesInChat.howMuchScrollWas>=8){
+        else if (informationAboutMessagesInChat.howMuchScrollWas >= 8) {
             informationAboutMessagesInChat.howMuchMessagesWeNeedAfterScroll = 50;
         }
-        alert("need more");
+        var json = JSON.stringify({
+                "type": "MoreMessages",
+                "operation": "gettingMoreMessageinChat",
+                "chatID": output.id.substring(output.id.indexOf("_") + 1, output.id.length),
+                "userFrom": cookieValue,
+                "numberMessagesAlreadyInChat": informationAboutMessagesInChat.numbersMessagesInChat,
+                "minDateInChat": informationAboutMessagesInChat.minDateInChat,
+                "howMuchWeNeed": informationAboutMessagesInChat.howMuchMessagesWeNeedAfterScroll
+            }
+        );
+        doSend(json);
+
     }
 }

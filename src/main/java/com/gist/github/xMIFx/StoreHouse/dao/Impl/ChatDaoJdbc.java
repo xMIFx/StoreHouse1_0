@@ -71,10 +71,11 @@ public class ChatDaoJdbc implements ChatDao {
                      ",allMessagesInChat.message\n" +
                      ",allMessagesInChat.UserFrom\n" +
                      ",allMessagesInChat.dateMessage\n" +
-                     ",messagestouser.userUUID userUUIDTo\n" +
-                     ",messagestouser.newMes\n" +
+                     ",messagestouser.userUUID userToUUID\n" +
+                     ",messagestouser.newMes newMessage\n" +
                      ",messagestouser.markToDelete\n" +
                      ",allMessageCountTable.countAllMess\n" +
+                     ",allMessagesInChat.markForDeleteUserFrom\n" +
                      "from\n" +
                      "(select\n" +
                      "messages.id idMessage\n" +
@@ -83,6 +84,7 @@ public class ChatDaoJdbc implements ChatDao {
                      ",messages.UserFrom\n" +
                      ",messages.dateMessage\n" +
                      ",messagestouser.userUUID UserToUUID\n" +
+                     ",messages.markForDeleteUserFrom\n" +
                      ",case When messagestouser.userUUID is null then\n" +
                      "messages.markForDeleteUserFrom\n" +
                      "else\n" +
@@ -125,7 +127,7 @@ public class ChatDaoJdbc implements ChatDao {
                      "messagestouser.markToDelete\n" +
                      "end =0\n" +
                      "group by m.idChat) as allMessageCountTable\n" +
-                     "on allMessagesInChat.idChat = allMessageCountTable.idChat);")) {
+                     "on allMessagesInChat.idChat = allMessageCountTable.idChat;")) {
 
 
             while (resultSet.next()) {
@@ -154,7 +156,7 @@ public class ChatDaoJdbc implements ChatDao {
                         messagesMap.put(message.getIdMessage(), message);
                         itNewMes = true;
                     }
-                    message.addUserTo(resultSet.getString("userToUUID"), resultSet.getBoolean("newMessage"), resultSet.getBoolean("markToDelete"));
+                    message.addUserTo(UserConstant.getUserConst().getAllUser().get(resultSet.getString("userToUUID")), resultSet.getBoolean("newMessage"), resultSet.getBoolean("markToDelete"));
                     if (itNewMes) {
                         chat.addMessage(message);
                         countMessage++;
@@ -172,9 +174,9 @@ public class ChatDaoJdbc implements ChatDao {
                 }*/
             }
             chat.setIsThereSomeMoreMessages((allMessagesCount > countMessage) ? true : false);
-            List<String> usersFromChat = getUsersFromChat(chat.getIdChat());
-            for (String userFromChat: usersFromChat){
-                chat.addUser(UserConstant.getUserConst().getAllUser().get(userFromChat));
+            List<User> usersFromChat = getUsersFromChat(chat.getIdChat());
+            for (User userFromChat: usersFromChat){
+                chat.addUser(userFromChat);
             }
         }
 
@@ -182,8 +184,8 @@ public class ChatDaoJdbc implements ChatDao {
     }
 
     @Override
-    public List<String> getUsersFromChat(int chatID) throws SQLException {
-        List<String> usersUUIDList = new ArrayList<>();
+    public List<User> getUsersFromChat(int chatID) throws SQLException {
+        List<User> usersUUIDList = new ArrayList<>();
         Connection con = dataSource.getConnection();
         try (Statement st = con.createStatement();
              ResultSet resultSet = st.executeQuery("SELECT \n" +
@@ -192,7 +194,7 @@ public class ChatDaoJdbc implements ChatDao {
                      " FROM storehouse.chatsusers\n" +
                      " where chatsusers.idChat =" + chatID + ";")) {
             while (resultSet.next()) {
-                usersUUIDList.add(resultSet.getString("userUUID"));
+                usersUUIDList.add(UserConstant.getUserConst().getAllUser().get(resultSet.getString("userUUID")));
             }
         }
         return usersUUIDList;
@@ -312,7 +314,7 @@ public class ChatDaoJdbc implements ChatDao {
                         messagesMap.put(message.getIdMessage(), message);
                         itNewMes = true;
                     }
-                    message.addUserTo(resultSet.getString("userToUUID"), resultSet.getBoolean("newMessage"), resultSet.getBoolean("markToDelete"));
+                    message.addUserTo(UserConstant.getUserConst().getAllUser().get(resultSet.getString("userToUUID")), resultSet.getBoolean("newMessage"), resultSet.getBoolean("markToDelete"));
                     if (itNewMes) {
                         chat.addMessage(message);
                         countMessage++;
@@ -330,9 +332,9 @@ public class ChatDaoJdbc implements ChatDao {
                 }*/
             }
             chat.setIsThereSomeMoreMessages((allMessagesCount > (countMessage+countMessageAlreadyInChat)) ? true : false);
-            List<String> usersFromChat = getUsersFromChat(chat.getIdChat());
-            for (String userFromChat: usersFromChat){
-                chat.addUser(UserConstant.getUserConst().getAllUser().get(userFromChat));
+            List<User> usersFromChat = getUsersFromChat(chat.getIdChat());
+            for (User userFromChat: usersFromChat){
+                chat.addUser(userFromChat);
             }
         }
 
@@ -462,7 +464,7 @@ public class ChatDaoJdbc implements ChatDao {
                         messagesMap.put(message.getIdMessage(), message);
                         itNewMes = true;
                     }
-                    message.addUserTo(resultSet.getString("userToUUID"), resultSet.getBoolean("newMessage"), resultSet.getBoolean("markToDelete"));
+                    message.addUserTo(UserConstant.getUserConst().getAllUser().get(resultSet.getString("userToUUID")), resultSet.getBoolean("newMessage"), resultSet.getBoolean("markToDelete"));
                     if (itNewMes) {
                         chat.addMessage(message);
                         countMessage++;

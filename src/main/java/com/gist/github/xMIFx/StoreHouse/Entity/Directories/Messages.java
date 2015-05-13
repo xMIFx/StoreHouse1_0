@@ -1,7 +1,9 @@
 package com.gist.github.xMIFx.StoreHouse.Entity.Directories;
 
+import com.gist.github.xMIFx.StoreHouse.Entity.OtherHelpingEntity.Consts.UserConstant;
 import org.codehaus.jackson.annotate.JsonIgnore;
 
+import java.sql.SQLException;
 import java.util.*;
 
 /**
@@ -9,22 +11,22 @@ import java.util.*;
  */
 public class Messages {
     private class UsersTo {
-        private String userToUUID;
+        private User userTo;
         private boolean itNewMessage;
         private boolean itDeleted;
 
-        public UsersTo(String userToUUID, boolean itNewMessage, boolean itDeleted) {
-            this.userToUUID = userToUUID;
+        public UsersTo(User userTo, boolean itNewMessage, boolean itDeleted) {
+            this.userTo = userTo;
             this.itNewMessage = itNewMessage;
             this.itDeleted = itDeleted;
         }
 
-        public String getUserToUUID() {
-            return userToUUID;
+        public User getUserTo() {
+            return userTo;
         }
 
-        public void setUserToUUID(String userToUUID) {
-            this.userToUUID = userToUUID;
+        public void setUserTo(User userTo) {
+            this.userTo = userTo;
         }
 
         public boolean isItNewMessage() {
@@ -50,13 +52,13 @@ public class Messages {
 
             UsersTo usersTo = (UsersTo) o;
 
-            return !(userToUUID != null ? !userToUUID.equals(usersTo.userToUUID) : usersTo.userToUUID != null);
+            return !(userTo != null ? !userTo.equals(usersTo.userTo) : usersTo.userTo != null);
 
         }
 
         @Override
         public int hashCode() {
-            return userToUUID != null ? userToUUID.hashCode() : 0;
+            return userTo != null ? userTo.hashCode() : 0;
         }
     }
 
@@ -68,6 +70,7 @@ public class Messages {
     private boolean markForDelete;
     private Date dateMessage;
     private Set<UsersTo> usersTo;
+    private List<User> usersWhichDontRead; //For Web. every time new
     private final String type = "Messages"; //for json
 
     public Messages() {
@@ -158,7 +161,7 @@ public class Messages {
         }
         Set<String> usersUUIDTo = new HashSet<>();
         for (UsersTo userTo : usersTo) {
-            usersUUIDTo.add(userTo.getUserToUUID());
+            usersUUIDTo.add(userTo.getUserTo().getUuid());
         }
         return usersUUIDTo;
     }
@@ -167,7 +170,7 @@ public class Messages {
     public boolean isNewMessageForUserUUID(String userUUID) {
         boolean newMes = false;
         for (UsersTo us : usersTo) {
-            if (us.getUserToUUID().equals(userUUID)) {
+            if (us.getUserTo().getUuid().equals(userUUID)) {
                 newMes = us.isItNewMessage();
                 break;
             }
@@ -193,7 +196,7 @@ public class Messages {
     public boolean isDeletedMessageForUserUUID(String userUUID) {
         boolean deletedMes = true;
         for (UsersTo us : usersTo) {
-            if (us.getUserToUUID().equals(userUUID)) {
+            if (us.getUserTo().getUuid().equals(userUUID)) {
                 deletedMes = us.isItDeleted();
                 break;
             }
@@ -202,23 +205,34 @@ public class Messages {
         return deletedMes;
     }
 
+    public List<User> getUsersWhichDontRead() {
+        List<User> usersWhichDontReadNew = new ArrayList<>();
+        if (usersTo != null) {
+            for (UsersTo userTo : usersTo) {
+                if (userTo.isItNewMessage()) {
+                    usersWhichDontReadNew.add(userTo.getUserTo());
+                }
+            }
+        }
+        return usersWhichDontReadNew;
+    }
 
-    public void addUserTo(String userUUID, boolean isNewMassage, boolean isDeleted) {
+    public void addUserTo(User user, boolean isNewMassage, boolean isDeleted) {
         if (usersTo == null) {
             usersTo = new HashSet<>();
         }
-        if (!userUUID.equals(userFrom.getUuid())) {
-            usersTo.add(new UsersTo(userUUID, isNewMassage, isDeleted));
+        if (!user.getUuid().equals(userFrom.getUuid())) {
+            usersTo.add(new UsersTo(user, isNewMassage, isDeleted));
         }
     }
 
-    public void addAllUserTo(List<String> usersToUUID, boolean isNewMassage, boolean isDeleted) {
+    public void addAllUserTo(List<User> allUsersTo, boolean isNewMassage, boolean isDeleted) {
         if (usersTo == null) {
             usersTo = new HashSet<>();
         }
-        for (String userUUID : usersToUUID) {
-            if (!userUUID.equals(userFrom.getUuid())) {
-                usersTo.add(new UsersTo(userUUID, isNewMassage, isDeleted));
+        for (User user : allUsersTo) {
+            if (!user.getUuid().equals(userFrom.getUuid())) {
+                usersTo.add(new UsersTo(user, isNewMassage, isDeleted));
             }
         }
     }
