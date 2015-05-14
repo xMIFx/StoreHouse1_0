@@ -1,7 +1,7 @@
 /**
  * Created by bukatinvv on 02.04.2015.
  */
-
+var UUIDGenerator = createUUID();
 var output;
 var informationAboutMessagesInChat = {
     numbersMessagesInChat: 0,
@@ -37,17 +37,36 @@ function getCookie(name) {
     return matches ? decodeURIComponent(matches[1]) : undefined;
 }
 
+function createUUID() {
+    var self = {};
+    var lut = []; for (var i=0; i<256; i++) { lut[i] = (i<16?'0':'')+(i).toString(16); }
+    self.generate = function() {
+        var d0 = Math.random()*0xffffffff|0;
+        var d1 = Math.random()*0xffffffff|0;
+        var d2 = Math.random()*0xffffffff|0;
+        var d3 = Math.random()*0xffffffff|0;
+        return lut[d0&0xff]+lut[d0>>8&0xff]+lut[d0>>16&0xff]+lut[d0>>24&0xff]+'-'+
+            lut[d1&0xff]+lut[d1>>8&0xff]+'-'+lut[d1>>16&0x0f|0x40]+lut[d1>>24&0xff]+'-'+
+            lut[d2&0x3f|0x80]+lut[d2>>8&0xff]+'-'+lut[d2>>16&0xff]+lut[d2>>24&0xff]+
+            lut[d3&0xff]+lut[d3>>8&0xff]+lut[d3>>16&0xff]+lut[d3>>24&0xff];
+    }
+    return self;
+}
+
 function send_message() {
     if (output.id != 'usersChat_0') {
-
-        var jsonStr = JSON.stringify({
-            "type": 'Messages',
-            "userFrom": cookieValue,
-            "message": document.getElementById('textID').value,
-            "newMessage": true,
-            "dateMessage": new Date().getTime(),
-            "chatID": output.id.substring(output.id.indexOf("_") + 1, output.id.length)
-        });
+        var mes = {
+            type: 'Messages',
+            userFrom: cookieValue,
+            message: document.getElementById('textID').value,
+            newMessage: true,
+            dateMessage: new Date().getTime(),
+            chatID: output.id.substring(output.id.indexOf("_") + 1, output.id.length),
+            UUIDFromBrowser:UUIDGenerator.generate()
+        };
+        var jsonStr = JSON.stringify(mes);
+        localStorage.setItem(mes.UUIDFromBrowser,mes);
+        writeToScreenMessageFromObject(mes);
         doSend(jsonStr);
     }
 }
@@ -56,11 +75,39 @@ function addToArrayUsers(jsonUser) {
     var user = {
         userName: jsonUser.name,
         userLogin: jsonUser.login,
-        userUUID: jsonUser.cryptUUID
+        userUUID: jsonUser.cryptUUID,
+        currentUser: (jsonUser.cryptUUID==cookieValue)
     }
     arrayUsers.push(user);
 }
 
+function getCurrentUser() {
+    var curUser;
+    for (var i = 0; i < arrayUsers.length; i++) {
+            if(arrayUsers[i].currentUser){
+                curUser = arrayUsers[i];
+            }
+    }
+    if(curUser == null){
+        curUser = {
+            userName: '',
+            userLogin: '',
+            userUUID: '',
+            currentUser: false
+        }
+    }
+    return curUser;
+}
+
+function getUsersWithoutCurrent() {
+    var otherUsers = [];
+    for (var i = 0; i < arrayUsers.length; i++) {
+        if(!arrayUsers[i].currentUser){
+            otherUsers.push(arrayUsers[i]);
+        }
+    }
+    return otherUsers;
+}
 /*function setArrayUsers() {
  var elementsUsersChat = document.getElementById('information_about_chat').childNodes, strId, elUser, j = 0;
  var reUs = new RegExp('chatsUsers', 'g');
@@ -212,10 +259,10 @@ function writeToScreenMessageFromJson(messageJson, beggining) {
         if (messageJson.usersWhichDontRead.length > 0) {
             var whoDoesntRead = document.createElement("p");
             whoDoesntRead.classList.add('WhoDontRead');
-            whoDoesntRead.innerHTML = "Doesn't read: "+messageJson.usersWhichDontRead[0].login;
+            whoDoesntRead.innerHTML = "Doesn't read: " + messageJson.usersWhichDontRead[0].login;
             for (var j = 1; j < messageJson.usersWhichDontRead.length; j++) {
-                whoDoesntRead.innerHTML =  whoDoesntRead.innerHTML+"; "+messageJson.usersWhichDontRead[j].login;
-           }
+                whoDoesntRead.innerHTML = whoDoesntRead.innerHTML + "; " + messageJson.usersWhichDontRead[j].login;
+            }
             newMessage.appendChild(whoDoesntRead);
         }
         //message
@@ -237,6 +284,52 @@ function writeToScreenMessageFromJson(messageJson, beggining) {
     }
 }
 
+function writeToScreenMessageFromObject(message) {
+    if (output === undefined) {
+        setOutput();
+    }
+    if (document.getElementById("message_" + message.UUIDFromBrowser) == null) {
+        var newMessage = document.createElement("div");
+        newMessage.classList.add('MessageClass');
+        newMessage.classList.add('Sending');
+        newMessage.id = "message_" + message.UUIDFromBrowser;
+        if (message.newMessage) {
+            newMessage.classList.add('NewMessage');
+        }
+        newMessage.classList.add('MyMessage');
+
+
+        //from
+        var options = {
+            weekday: "long", year: "numeric", month: "short", hour12: false,
+            day: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit"
+        };
+        var whoWright = document.createElement("p");
+        whoWright.innerHTML = getCurrentUser().userName + " " + (new Date(message.dateMessage)).toLocaleTimeString(navigator.language, options);
+        whoWright.classList.add('WhoWright');
+        newMessage.appendChild(whoWright);
+        //who don't read
+
+        var whoDoesntRead = document.createElement("p");
+        whoDoesntRead.classList.add('WhoDontRead');
+        usersWhichDontRead = getUsersWithoutCurrent();
+        whoDoesntRead.innerHTML = "Doesn't read: " + usersWhichDontRead[0].userLogin;
+        for (var j = 1; j < usersWhichDontRead.length; j++) {
+            whoDoesntRead.innerHTML = whoDoesntRead.innerHTML + "; " + usersWhichDontRead[j].userLogin;
+        }
+        newMessage.appendChild(whoDoesntRead);
+
+        //message
+        var pre = document.createElement("p");
+        pre.innerHTML = message.message;
+        pre.classList.add('MessageText');
+        newMessage.appendChild(pre);
+        output.appendChild(newMessage);
+        output.scrollTop = output.scrollHeight;
+
+    }
+}
+
 function writeAboutCountNewMassages(json) {
     var i;
     for (i = 0; i < json.chats.length; i++) {
@@ -250,7 +343,7 @@ function writeAboutCountNewMassages(json) {
                 }
             }
         }
-        writeToScreenAbountCountNewMess(idForChange, parseInt(json.chats[i].newMessagesCount));
+        writeToScreenAboutCountNewMess(idForChange, parseInt(json.chats[i].newMessagesCount));
 
     }
 
@@ -348,7 +441,14 @@ function writeAboutChat(json) {
         for (var j = 0; j < json.messagesList.length; j++) {
             writeToScreenMessageFromJson(json.messagesList[j], true);
         }
+
     }
+    /*var k = 0, el, elementsss = document.getElementsByClassName('MessageClass');
+    while (el = elementsss[k++]) {
+        if (checkIfElementInDivScope(output, el)) {
+            alert(el.id);
+        }
+    }*/
 }
 
 function addNewLastChat(valueIdForCheck, userTo, chatName) {
@@ -405,10 +505,10 @@ function addNewMessages(userFrom, chatID) {
     if (document.getElementById(idForChange) == null) {
         idForChange = 'user_' + userFrom.id;
     }
-    writeToScreenAbountCountNewMess(idForChange, 1);
+    writeToScreenAboutCountNewMess(idForChange, 1);
 }
 
-function writeToScreenAbountCountNewMess(idForWrite, countNewMes) {
+function writeToScreenAboutCountNewMess(idForWrite, countNewMes) {
     if (document.getElementById(idForWrite) != null) {
         var elements = document.getElementById(idForWrite).childNodes, el, i = 0;
         while (el = elements[i++]) {
@@ -437,7 +537,7 @@ function writeToScreenAbountCountNewMess(idForWrite, countNewMes) {
 function functionOnScrollChat(div) {
     var scrolled = div.scrollTop;
     //when scrolled =0. then need more messages
-    if (scrolled == 0 && informationAboutMessagesInChat.thereAreAnyMessages) {
+     if (scrolled == 0 && informationAboutMessagesInChat.thereAreAnyMessages) {
         informationAboutMessagesInChat.howMuchScrollWas++;
         if (informationAboutMessagesInChat.howMuchScrollWas > 2 && informationAboutMessagesInChat.howMuchScrollWas < 5) {
             informationAboutMessagesInChat.howMuchMessagesWeNeedAfterScroll = 25;
@@ -461,4 +561,17 @@ function functionOnScrollChat(div) {
         doSend(json);
 
     }
+}
+
+function checkIfElementInDivScope(whereCheck, el) {
+    var itIs = false;
+    var scrollTop = whereCheck.scrollTop;
+    var windowHeight = whereCheck.offsetHeight;
+    var elementOffset = el.offsetTop;
+    var elementHeight = el.offsetHeight;
+    if (scrollTop<=(elementOffset-elementHeight) && (elementOffset-elementHeight <= (scrollTop + windowHeight))) {
+         itIs = true;
+    }
+    return itIs;
+
 }
