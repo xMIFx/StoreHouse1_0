@@ -76,6 +76,7 @@ public class ChatDaoJdbc implements ChatDao {
                      ",messagestouser.markToDelete\n" +
                      ",allMessageCountTable.countAllMess\n" +
                      ",allMessagesInChat.markForDeleteUserFrom\n" +
+                     ",allMessagesInChat.UUIDFromBrowser\n" +
                      "from\n" +
                      "(select\n" +
                      "messages.id idMessage\n" +
@@ -83,6 +84,7 @@ public class ChatDaoJdbc implements ChatDao {
                      ",messages.message\n" +
                      ",messages.UserFrom\n" +
                      ",messages.dateMessage\n" +
+                     ",messages.UUIDFromBrowser\n" +
                      ",messagestouser.userUUID UserToUUID\n" +
                      ",messages.markForDeleteUserFrom\n" +
                      ",case When messagestouser.userUUID is null then\n" +
@@ -151,7 +153,8 @@ public class ChatDaoJdbc implements ChatDao {
                                 , resultSet.getInt("idMessage")
                                 , resultSet.getString("message")
                                 , resultSet.getBoolean("newMessage")
-                                , new Date(resultSet.getTimestamp("dateMessage").getTime()));
+                                , new Date(resultSet.getTimestamp("dateMessage").getTime())
+                                , resultSet.getString("UUIDFromBrowser"));
                         message.setMarkForDelete(resultSet.getBoolean("markForDeleteUserFrom"));
                         messagesMap.put(message.getIdMessage(), message);
                         itNewMes = true;
@@ -228,6 +231,7 @@ public class ChatDaoJdbc implements ChatDao {
                      ",allMessagesInChat.UserFrom\n" +
                      ",allMessagesInChat.markForDeleteUserFrom\n" +
                      ",allMessagesInChat.dateMessage\n" +
+                     ",allMessagesInChat.UUIDFromBrowser\n" +
                      ",messagestouser.userUUID userToUUID\n" +
                      ",ifNULL(messagestouser.newMes,0) newMessage\n" +
                      ",messagestouser.markToDelete\n" +
@@ -240,6 +244,7 @@ public class ChatDaoJdbc implements ChatDao {
                      ",messages.UserFrom\n" +
                      ",messages.markForDeleteUserFrom\n" +
                      ",messages.dateMessage\n" +
+                     ",messages.UUIDFromBrowser\n" +
                      ",messagestouser.userUUID UserToUUID\n" +
                      ",case When messagestouser.userUUID is null then\n" +
                      "messages.markForDeleteUserFrom\n" +
@@ -309,7 +314,8 @@ public class ChatDaoJdbc implements ChatDao {
                                 , resultSet.getInt("idMessage")
                                 , resultSet.getString("message")
                                 , resultSet.getBoolean("newMessage")
-                                , new Date(resultSet.getTimestamp("dateMessage").getTime()));
+                                , new Date(resultSet.getTimestamp("dateMessage").getTime())
+                                , resultSet.getString("UUIDFromBrowser"));
                         message.setMarkForDelete(resultSet.getBoolean("markForDeleteUserFrom"));
                         messagesMap.put(message.getIdMessage(), message);
                         itNewMes = true;
@@ -356,6 +362,7 @@ public class ChatDaoJdbc implements ChatDao {
                      ",allMessagesInChat.message\n" +
                      ",allMessagesInChat.UserFrom\n" +
                      ",allMessagesInChat.dateMessage\n" +
+                     ",allMessagesInChat.UUIDFromBrowser\n" +
                      ",messagestouser.userUUID userToUUID\n" +
                      ",ifNULL(messagestouser.newMes,0) newMessage\n" +
                      ",messagestouser.markToDelete\n" +
@@ -367,6 +374,7 @@ public class ChatDaoJdbc implements ChatDao {
                      ",messages.message\n" +
                      ",messages.UserFrom\n" +
                      ",messages.dateMessage\n" +
+                     ",messages.UUIDFromBrowser\n" +
                      ",messagestouser.userUUID UserToUUID\n" +
                      ",case When messagestouser.userUUID is null then\n" +
                      "messages.markForDeleteUserFrom\n" +
@@ -460,7 +468,8 @@ public class ChatDaoJdbc implements ChatDao {
                                 , resultSet.getInt("idMessage")
                                 , resultSet.getString("message")
                                 , resultSet.getBoolean("newMessage")
-                                , new Date(resultSet.getTimestamp("dateMessage").getTime()));
+                                , new Date(resultSet.getTimestamp("dateMessage").getTime())
+                                , resultSet.getString("UUIDFromBrowser"));
                         messagesMap.put(message.getIdMessage(), message);
                         itNewMes = true;
                     }
@@ -491,8 +500,8 @@ public class ChatDaoJdbc implements ChatDao {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         int autoIncKeyId = -1;
         try (Statement st = connection.createStatement()) {
-            st.executeUpdate("INSERT INTO `storehouse`.`messages` (`idChat`, `UserFrom`, `message`, `dateMessage`) " +
-                    "VALUES ('" + mes.getChatID() + "', '" + mes.getUserFrom().getUuid() + "', '" + mes.getMessage() + "', '" + dateFormat.format(mes.getDateMessage()) + "');"
+            st.executeUpdate("INSERT INTO `storehouse`.`messages` (`idChat`, `UserFrom`, `message`, `dateMessage`,'UUIDFromBrowser') " +
+                    "VALUES ('" + mes.getChatID() + "', '" + mes.getUserFrom().getUuid() + "', '" + mes.getMessage() + "', '" + dateFormat.format(mes.getDateMessage()) + "', '" + mes.getUUIDFromBrowser()  + "');"
                     , Statement.RETURN_GENERATED_KEYS);
 
             try (ResultSet rs = st.getGeneratedKeys()) {

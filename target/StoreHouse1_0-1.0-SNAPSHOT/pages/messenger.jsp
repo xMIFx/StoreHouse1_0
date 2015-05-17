@@ -16,6 +16,7 @@
     <script src="${pageContext.request.contextPath}/jsFiles/sendMessages.js"></script>
     <script src="${pageContext.request.contextPath}/jsFiles/showHideFunction.js"></script>
     <link href="${pageContext.request.contextPath}/cssFiles/messangerStyle.css" rel="stylesheet" type="text/css">
+    <link href="${pageContext.request.contextPath}/cssFiles/loadingStyle.css" rel="stylesheet" type="text/css">
 </head>
 
 <body>
@@ -65,9 +66,9 @@
         </div>
     </div>
     <div id="output_box" class="output_box" onload="initOutput()">
+        <div class="chat_box" id="usersChat_0"  onscroll="functionOnScrollChat(this)">
 
-
-        <div class="chat_box" id="usersChat_0"  onscroll="functionOnScrollChat(this)"></div>
+        </div>
         <div style="text-align: center;">
             <form action="">
                 <input onclick="send_message()" value="Send" type="button">
@@ -101,6 +102,31 @@
 
         </c:forEach>
     </div>
+</div>
+<div class="MessageClass CloneClass" id="cloneMessage">
+    <div class="loading">
+        <div class="circular3dGParent">
+            <div class="circular3dG">
+            </div>
+            <div  class="circular3dG circular3d_2G">
+            </div>
+            <div  class="circular3dG circular3d_3G">
+            </div>
+            <div  class="circular3dG circular3d_4G">
+            </div>
+            <div  class="circular3dG circular3d_5G">
+            </div>
+            <div  class="circular3dG circular3d_6G">
+            </div>
+            <div  class="circular3dG circular3d_7G">
+            </div>
+            <div  class="circular3dG circular3d_8G">
+            </div>
+        </div>
+    </div>
+    <p class="WhoWright"></p>
+    <p class="WhoDontRead"></p>
+    <p class="MessageText"></p>
 </div>
 </body>
 </html>

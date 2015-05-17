@@ -61,7 +61,7 @@ public class MessengerSocket extends DependenceInjectionClass {
 
     @OnError
     public void onError(Session session, Throwable t) {
-        //t.printStackTrace(); ignored for first time
+        t.printStackTrace(); //ignored for first time
     }
 
     @OnMessage
@@ -73,9 +73,9 @@ public class MessengerSocket extends DependenceInjectionClass {
 
     private void parseMessageFromJson(Session session, String msg) {
         ObjectMapper objectMapper = new ObjectMapper();
-        Map<String, String> myMap = null;
+        Map<String, Object> myMap = null;
         try {
-            myMap = objectMapper.readValue(msg, new TypeReference<HashMap<String, String>>() {
+            myMap = objectMapper.readValue(msg, new TypeReference<HashMap<String, Object>>() {
             });
         } catch (IOException e) {
             e.printStackTrace();
@@ -85,8 +85,8 @@ public class MessengerSocket extends DependenceInjectionClass {
             sendMessage(session, msg, myMap);
         } else if (myMap != null && myMap.get("type").equals("Chat")) {
             try {
-                String userToUUID = User.decryptUUID(myMap.get("userTo"));
-                String currentUser = User.decryptUUID(myMap.get("userFrom"));
+                String userToUUID = User.decryptUUID((String)myMap.get("userTo"));
+                String currentUser = User.decryptUUID((String)myMap.get("userFrom"));
                 Chats chat = txManager.doInTransaction(() -> chatsDao.getChatBetweenUsers(currentUser, userToUUID));
                 sendMessageAboutChat(session, chat);
             } catch (AesException e) {
@@ -98,8 +98,8 @@ public class MessengerSocket extends DependenceInjectionClass {
             }
         } else if (myMap != null && myMap.get("type").equals("bigChat")) {
             try {
-                int chatID = Integer.valueOf(myMap.get("chatID"));
-                String currentUser = User.decryptUUID(myMap.get("userFrom"));
+                int chatID = (int)myMap.get("chatID");
+                String currentUser = User.decryptUUID((String)myMap.get("userFrom"));
                 Chats chat = txManager.doInTransaction(() -> chatsDao.getChatByID(chatID, currentUser));
                 if (chat.getUserList().contains(UserConstant.getUserConst().getAllUser().get(currentUser))) {
                     sendMessageAboutChat(session, chat);
@@ -114,11 +114,11 @@ public class MessengerSocket extends DependenceInjectionClass {
             }
         } else if (myMap != null && myMap.get("type").equals("MoreMessages")) {
             try {
-                int chatID = Integer.valueOf(myMap.get("chatID"));
-                int numberMessageAlreadyInChat = Integer.valueOf(myMap.get("numberMessagesAlreadyInChat"));
-                Date minDateInChat = new Date(Long.valueOf(myMap.get("minDateInChat")));
-                int howMuchNeed = Integer.valueOf(myMap.get("howMuchWeNeed"));
-                String currentUser = User.decryptUUID(myMap.get("userFrom"));
+                int chatID = (int)myMap.get("chatID");
+                int numberMessageAlreadyInChat = (int)myMap.get("numberMessagesAlreadyInChat");
+                Date minDateInChat = new Date(Long.valueOf((String)myMap.get("minDateInChat")));
+                int howMuchNeed =(int)myMap.get("howMuchWeNeed");
+                String currentUser = User.decryptUUID((String)myMap.get("userFrom"));
                 Chats chat = txManager.doInTransaction(() -> chatsDao.getMoreMessagesInChat(chatID, numberMessageAlreadyInChat, minDateInChat, howMuchNeed, currentUser));
                 sendMessageAboutChat(session, chat);
             } catch (AesException e) {
@@ -157,17 +157,18 @@ public class MessengerSocket extends DependenceInjectionClass {
 
     }
 
-    public void sendMessage(Session session, String msg, Map<String, String> myMap) {
+    public void sendMessage(Session session, String msg, Map<String, Object> myMap) {
         try {
-            List<User> allUsersFromChat = txManager.doInTransaction(() -> chatsDao.getUsersFromChat(Integer.valueOf(myMap.get("chatID"))));
+            List<User> allUsersFromChat = txManager.doInTransaction(() -> chatsDao.getUsersFromChat(Integer.valueOf((String)myMap.get("chatID"))));
 
-            if (checkUser(allUsersFromChat, User.decryptUUID(myMap.get("userFrom")))) {
+            if (checkUser(allUsersFromChat, User.decryptUUID((String)myMap.get("userFrom")))) {
                 Messages newMessage = new Messages(
-                        UserConstant.getUserConst().getAllUser().get(User.decryptUUID(myMap.get("userFrom"))),
-                        Integer.valueOf(myMap.get("chatID")),
-                        myMap.get("message"),
-                        Boolean.valueOf(myMap.get("newMessage")),
-                        new Date(Long.valueOf(myMap.get("dateMessage"))));
+                        UserConstant.getUserConst().getAllUser().get(User.decryptUUID((String)myMap.get("userFrom"))),
+                        Integer.valueOf((String)myMap.get("chatID")),
+                        (String)myMap.get("message"),
+                        Boolean.valueOf((String)myMap.get("newMessage")),
+                        new Date(Long.valueOf((String)myMap.get("dateMessage"))),
+                        (String)myMap.get("UUIDFromBrowser"));
                 newMessage.addAllUserTo(allUsersFromChat, true, false);
                 newMessage.setIdMessage(txManager.doInTransaction(() -> chatsDao.saveMessage(newMessage)));
                 ObjectMapper mapper = new ObjectMapper();

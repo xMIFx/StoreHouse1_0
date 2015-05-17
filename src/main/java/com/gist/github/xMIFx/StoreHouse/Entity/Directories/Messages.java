@@ -71,26 +71,29 @@ public class Messages {
     private Date dateMessage;
     private Set<UsersTo> usersTo;
     private List<User> usersWhichDontRead; //For Web. every time new
+    private String UUIDFromBrowser;
     private final String type = "Messages"; //for json
 
     public Messages() {
     }
 
-    public Messages(User userFrom, int chatID, int id, String message, boolean newMessage, Date dateMessage) {
+    public Messages(User userFrom, int chatID, int id, String message, boolean newMessage, Date dateMessage, String UUIDFromBrowser) {
         this.userFrom = userFrom;
         this.chatID = chatID;
         this.message = message;
         this.idMessage = id;
         this.newMessage = newMessage;
         this.dateMessage = dateMessage;
+        this.UUIDFromBrowser = UUIDFromBrowser;
     }
 
-    public Messages(User userFrom, int chatID, String message, boolean newMessage, Date dateMessage) {
+    public Messages(User userFrom, int chatID, String message, boolean newMessage, Date dateMessage, String UUIDFromBrowser) {
         this.userFrom = userFrom;
         this.chatID = chatID;
         this.message = message;
         this.newMessage = newMessage;
         this.dateMessage = dateMessage;
+        this.UUIDFromBrowser = UUIDFromBrowser;
     }
 
     public int getIdMessage() {
@@ -152,6 +155,14 @@ public class Messages {
 
     public void setMarkForDelete(boolean markForDelete) {
         this.markForDelete = markForDelete;
+    }
+
+    public String getUUIDFromBrowser() {
+        return UUIDFromBrowser;
+    }
+
+    public void setUUIDFromBrowser(String UUIDFromBrowser) {
+        this.UUIDFromBrowser = UUIDFromBrowser;
     }
 
     @JsonIgnore
@@ -245,21 +256,14 @@ public class Messages {
         Messages messages = (Messages) o;
 
         if (idMessage != messages.idMessage) return false;
-        if (chatID != messages.chatID) return false;
-        if (userFrom != null ? !userFrom.equals(messages.userFrom) : messages.userFrom != null)
-            return false;
-        if (message != null ? !message.equals(messages.message) : messages.message != null) return false;
-        return !(dateMessage != null ? !dateMessage.equals(messages.dateMessage) : messages.dateMessage != null);
+        return !(UUIDFromBrowser != null ? !UUIDFromBrowser.equals(messages.UUIDFromBrowser) : messages.UUIDFromBrowser != null);
 
     }
 
     @Override
     public int hashCode() {
-        int result = userFrom != null ? userFrom.hashCode() : 0;
-        result = 31 * result + idMessage;
-        result = 31 * result + chatID;
-        result = 31 * result + (message != null ? message.hashCode() : 0);
-        result = 31 * result + (dateMessage != null ? dateMessage.hashCode() : 0);
+        int result = idMessage;
+        result = 31 * result + (UUIDFromBrowser != null ? UUIDFromBrowser.hashCode() : 0);
         return result;
     }
 

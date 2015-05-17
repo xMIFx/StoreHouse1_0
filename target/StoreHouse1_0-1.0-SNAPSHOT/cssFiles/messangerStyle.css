@@ -55,13 +55,12 @@ ul li {
     list-style: none;
 }
 
-
-
 div.group a {
     margin-bottom: 9px;
     display: inline-block;
     vertical-align: middle;
 }
+
 div.group a.gr {
     font-size: 16px;
     font-weight: 700;
@@ -160,14 +159,33 @@ ul.groups.hide {
 
 div.MessageClass {
     text-align: left;
-    padding: 10px ;
-}
-div.MessageClass p{
-    margin: 0px;
-    padding-bottom: 5px ;
+    padding: 10px;
+    position: relative;
+    display: block;
 }
 
-div.MessageClass p.MessageText{
+div.CloneClass {
+     display: none;
+}
+
+div.loading {
+    position: absolute;
+}
+
+div.MessageClass div.loading {
+     display: none;
+}
+
+div.MessageClass.SendingMessage div.loading {
+    display: block;
+}
+
+div.MessageClass p {
+    margin: 0px;
+    padding-bottom: 5px;
+}
+
+div.MessageClass p.MessageText {
     margin-left: 10px;
 }
 
@@ -179,26 +197,30 @@ div.NewMessage {
 div.MyMessage {
     text-align: right;
 }
-p.MessageCount{
+
+p.MessageCount {
     margin: 0px;
     display: inline-block;
     font-size: 13px;
     vertical-align: middle;
     margin-bottom: 7px;
 }
-.glav{
+
+.glav {
     text-align: center;
     font-weight: 700;
 
- }
-li.user_ch:hover{
+}
+
+li.user_ch:hover {
     background: #ccc;
 }
 
-li.user_ch.active{
+li.user_ch.active {
     background: #ccc;
 }
-div.chat_box{
+
+div.chat_box {
     height: 500px;
     overflow-y: scroll;
 
