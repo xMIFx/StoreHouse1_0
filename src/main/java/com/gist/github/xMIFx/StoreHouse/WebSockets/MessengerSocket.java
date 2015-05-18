@@ -82,11 +82,11 @@ public class MessengerSocket extends DependenceInjectionClass {
         }
         System.out.println(msg);
         if (myMap != null && myMap.get("type").equals("Messages")) {
-            sendMessage(session, msg, myMap);
+            sendMessage(session, myMap);
         } else if (myMap != null && myMap.get("type").equals("Chat")) {
             try {
-                String userToUUID = User.decryptUUID((String)myMap.get("userTo"));
-                String currentUser = User.decryptUUID((String)myMap.get("userFrom"));
+                String userToUUID = User.decryptUUID((String) myMap.get("userTo"));
+                String currentUser = User.decryptUUID((String) myMap.get("userFrom"));
                 Chats chat = txManager.doInTransaction(() -> chatsDao.getChatBetweenUsers(currentUser, userToUUID));
                 sendMessageAboutChat(session, chat);
             } catch (AesException e) {
@@ -98,8 +98,8 @@ public class MessengerSocket extends DependenceInjectionClass {
             }
         } else if (myMap != null && myMap.get("type").equals("bigChat")) {
             try {
-                int chatID = (int)myMap.get("chatID");
-                String currentUser = User.decryptUUID((String)myMap.get("userFrom"));
+                int chatID = (int) myMap.get("chatID");
+                String currentUser = User.decryptUUID((String) myMap.get("userFrom"));
                 Chats chat = txManager.doInTransaction(() -> chatsDao.getChatByID(chatID, currentUser));
                 if (chat.getUserList().contains(UserConstant.getUserConst().getAllUser().get(currentUser))) {
                     sendMessageAboutChat(session, chat);
@@ -114,11 +114,11 @@ public class MessengerSocket extends DependenceInjectionClass {
             }
         } else if (myMap != null && myMap.get("type").equals("MoreMessages")) {
             try {
-                int chatID = (int)myMap.get("chatID");
-                int numberMessageAlreadyInChat = (int)myMap.get("numberMessagesAlreadyInChat");
-                Date minDateInChat = new Date(Long.valueOf((String)myMap.get("minDateInChat")));
-                int howMuchNeed =(int)myMap.get("howMuchWeNeed");
-                String currentUser = User.decryptUUID((String)myMap.get("userFrom"));
+                int chatID = (int) myMap.get("chatID");
+                int numberMessageAlreadyInChat = (int) myMap.get("numberMessagesAlreadyInChat");
+                Date minDateInChat = new Date((long) myMap.get("minDateInChat"));
+                int howMuchNeed = (int) myMap.get("howMuchWeNeed");
+                String currentUser = User.decryptUUID((String) myMap.get("userFrom"));
                 Chats chat = txManager.doInTransaction(() -> chatsDao.getMoreMessagesInChat(chatID, numberMessageAlreadyInChat, minDateInChat, howMuchNeed, currentUser));
                 sendMessageAboutChat(session, chat);
             } catch (AesException e) {
@@ -157,48 +157,70 @@ public class MessengerSocket extends DependenceInjectionClass {
 
     }
 
-    public void sendMessage(Session session, String msg, Map<String, Object> myMap) {
+    public void sendMessage(Session session, Map<String, Object> myMap) {
+        User userFrom = null;
+        boolean checking = true;
         try {
-            List<User> allUsersFromChat = txManager.doInTransaction(() -> chatsDao.getUsersFromChat(Integer.valueOf((String)myMap.get("chatID"))));
-
-            if (checkUser(allUsersFromChat, User.decryptUUID((String)myMap.get("userFrom")))) {
-                Messages newMessage = new Messages(
-                        UserConstant.getUserConst().getAllUser().get(User.decryptUUID((String)myMap.get("userFrom"))),
-                        Integer.valueOf((String)myMap.get("chatID")),
-                        (String)myMap.get("message"),
-                        Boolean.valueOf((String)myMap.get("newMessage")),
-                        new Date(Long.valueOf((String)myMap.get("dateMessage"))),
-                        (String)myMap.get("UUIDFromBrowser"));
-                newMessage.addAllUserTo(allUsersFromChat, true, false);
-                newMessage.setIdMessage(txManager.doInTransaction(() -> chatsDao.saveMessage(newMessage)));
-                ObjectMapper mapper = new ObjectMapper();
-
-                //session.getBasicRemote().sendText(jsonStr);
-
-                for (User userFromChat : allUsersFromChat) {
-                    if (usersWebSocketSession.containsKey(userFromChat.getUuid())) {
-                        if (userFromChat.getUuid().equals(newMessage.getUserFrom().getUuid())) {
-                            newMessage.setNewMessage(newMessage.isNewMessageForSomeOne());
-                        } else {
-                            newMessage.setNewMessage(newMessage.isNewMessageForUserUUID(userFromChat.getUuid()));
-                        }
-                        String jsonStr = mapper.writeValueAsString(newMessage);
-                        usersWebSocketSession.get(userFromChat.getUuid()).getBasicRemote().sendText(jsonStr);
-                    }
-                }
-            } else {
-                createSendMessageAboutException(session, "You can't write to this chat");
-            }
-
+            userFrom = UserConstant.getUserConst().getAllUser().get(User.decryptUUID((String) myMap.get("userFrom")));
         } catch (SQLException e) {
             e.printStackTrace();
-            createSendMessageAboutException(session, "Sorry, try later");
         } catch (AesException e) {
             e.printStackTrace();
-            createSendMessageAboutException(session, "Sorry, try later"); //need something about message
-        } catch (IOException e) {
-            e.printStackTrace();
-            createSendMessageAboutException(session, "Sorry, try latert"); //need something about message
+        }
+
+        Messages newMessage = new Messages(
+                userFrom,
+                (int) myMap.get("chatID"),
+                (String) myMap.get("messageText"),
+                (boolean) myMap.get("newMessage"),
+                new Date((long) myMap.get("dateMessageInTime")),
+                (String) myMap.get("UUIDFromBrowser"));
+        List<User> allUsersFromChat = null;
+        if (userFrom != null) {
+            try {
+                allUsersFromChat = txManager.doInTransaction(() -> chatsDao.getUsersFromChat((int) myMap.get("chatID")));
+                if (checkUser(allUsersFromChat, User.decryptUUID((String) myMap.get("userFrom")))) {
+                    checking = true;
+                    newMessage.addAllUserTo(allUsersFromChat, true, false);
+                    newMessage.setIdMessage(txManager.doInTransaction(() -> chatsDao.saveMessage(newMessage)));
+                } else {
+                    checking = false;
+                    createSendMessageAboutException(session, "You can't write to this chat");
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                newMessage.setExceptionWhenSending(true);
+            } catch (AesException e) {
+                e.printStackTrace();
+                newMessage.setExceptionWhenSending(true);
+                //need something about message
+            }
+            try {
+                ObjectMapper mapper = new ObjectMapper();
+                if (checking && !newMessage.isExceptionWhenSending()) {
+                    for (User userFromChat : allUsersFromChat) {
+                        if (usersWebSocketSession.containsKey(userFromChat.getUuid())) {
+                            if (userFromChat.getUuid().equals(newMessage.getUserFrom().getUuid())) {
+                                newMessage.setNewMessage(newMessage.isNewMessageForSomeOne());
+                            } else {
+                                newMessage.setNewMessage(newMessage.isNewMessageForUserUUID(userFromChat.getUuid()));
+                            }
+                            String jsonStr = mapper.writeValueAsString(newMessage);
+                            usersWebSocketSession.get(userFromChat.getUuid()).getBasicRemote().sendText(jsonStr);
+                        }
+                    }
+                } else if (checking && newMessage.isExceptionWhenSending()) {
+                    String jsonStr = mapper.writeValueAsString(newMessage);
+                    System.out.println(jsonStr);
+                    session.getBasicRemote().sendText(jsonStr);
+                }
+            } catch (JsonGenerationException e) {
+                e.printStackTrace();
+            } catch (JsonMappingException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
     }

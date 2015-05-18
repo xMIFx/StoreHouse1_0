@@ -9,7 +9,7 @@ var informationAboutMessagesInChat = {
     thereAreAnyMessages: true,
     howMuchMessagesWeNeedAfterScroll: 15,
     howMuchScrollWas: 0,
-    minDateInChat: new Date().getTime()
+    minDateInChat: new Date()
 }
 var arrayUsers = [];
 var cookieValue = getCookie('chat');
@@ -59,6 +59,7 @@ websocket.onerror = function (evt) {
 };
 
 function closeIt() {
+    alert('Close');
     websocket.close();
 }
 
@@ -66,7 +67,7 @@ window.onunload = closeIt;
 
 function createChatObject(chatId) {
     this.type = 'Chat';
-    this.chatID = chatId;
+    this.chatID = parseInt(chatId, 10);
     this.messages = [];
     this.addMessage = function (message) {
         this.messages.push(message);
@@ -111,7 +112,7 @@ function createMessageObjectFromLocalStorage(messageFromLocalStorage) {
             , messageFromLocalStorage.messageText
             , messageFromLocalStorage.fromServer);
         for (var i = 0; i < messageFromLocalStorage.usersWhichDontRead.length; i++) {
-            message.addUserWhichDontRead(createUserObjectFromLocalStorage(messageFromLocalStorage.usersWhichDontRead[i]));
+            message.addUserWhichDontRead(createUserObjectFromLocalStorage(messageFromLocalStorage.usersWhichDontRead[i].userUUID));
         }
     }
     return message;
@@ -124,20 +125,26 @@ function createMessageObject(chatID, UUIDFromBrowser, userFrom, newMessage, date
     this.messageText = messageText;
     this.newMessage = newMessage;
     this.dateMessage = dateMessage;
-    this.chatID = chatID;
+    this.chatID = parseInt(chatID, 10);
     this.UUIDFromBrowser = UUIDFromBrowser;
     this.messageID = null;
     this.usersWhichDontRead = [];
     this.fromServer = fromServer;
+    this.dateMessageInTime = this.dateMessage.getTime();
+    this.exceptionWhenSending = false;
+
     //Setters
     this.setMessageID = function (messageID) {
-        this.messageID = messageID;
+        this.messageID = parseInt(messageID, 10);
     }
     this.setUUUIDFromBrowser = function () {
         this.UUIDFromBrowser = UUIDGenerator.generate();
     }
     this.addUserWhichDontRead = function (user) {
         this.usersWhichDontRead.push(user);
+    }
+    this.setExceptionWhenSending = function (ExceptionWhenSending) {
+        this.exceptionWhenSending = ExceptionWhenSending;
     }
     //Getters
     this.getUserFrom = function () {
@@ -167,7 +174,9 @@ function createMessageObject(chatID, UUIDFromBrowser, userFrom, newMessage, date
     this.isFromServer = function () {
         return this.fromServer;
     }
-
+    this.getDateMessageInTime = function () {
+        return this.dateMessageInTime;
+    }
     this.addToLocalStorage = function () {
         var chatItem = createChatObjectFromLocalStorage(dataLocalStorage.get("chat_" + this.getChatID()));
         if (chatItem == null) {
@@ -187,6 +196,23 @@ function createMessageObject(chatID, UUIDFromBrowser, userFrom, newMessage, date
             }
         }
     }
+    this.isExceptionWhenSending = function () {
+        return this.exceptionWhenSending;
+    }
+
+    //ToJSON
+    this.toJSON = function (key) {
+        var replacement = new Object();
+        for (var val in this) {
+            if (val == 'userFrom') {
+                replacement[val] = this[val].userUUID;
+            }
+            else {
+                replacement[val] = this[val];
+            }
+        }
+        return replacement;
+    }
 }
 
 function createUserObject(name, login, userUUID) {
@@ -201,9 +227,7 @@ function createUserObject(name, login, userUUID) {
 function createUserObjectFromLocalStorage(userFromLocalStorage) {
     var user = null;
     if (userFromLocalStorage != null) {
-        user = new createUserObject(userFromLocalStorage.userName
-            , userFromLocalStorage.userLogin
-            , userFromLocalStorage.userUUID);
+        user = getUserFromCurrentChatByUUID(userFromLocalStorage);
     }
     return user;
 }
@@ -219,6 +243,7 @@ function createMessageObjectFromJson(messageJson) {
         , messageJson.message
         , true);
     message.setMessageID(messageJson.idMessage);
+    message.setExceptionWhenSending(messageJson.exceptionWhenSending);
 
     for (var j = 0; j < messageJson.usersWhichDontRead.length; j++) {
         message.addUserWhichDontRead(new createUserObject(messageJson.usersWhichDontRead[j].name
@@ -265,7 +290,7 @@ function send_message() {
             , document.getElementById('textID').value
             , false);
         var jsonStr = JSON.stringify(mes);
-        dontReadedUsers = getUsersWithoutCurrent();
+        dontReadedUsers = getUsersFromCurrentChatWithoutCurrent();
         for (var i = 0; i < dontReadedUsers.length; i++) {
             mes.addUserWhichDontRead(dontReadedUsers[i]);
         }
@@ -293,7 +318,7 @@ function getCurrentUser() {
     return curUser;
 }
 
-function getUsersWithoutCurrent() {
+function getUsersFromCurrentChatWithoutCurrent() {
     var otherUsers = [];
     for (var i = 0; i < arrayUsers.length; i++) {
         if (!arrayUsers[i].currentUser) {
@@ -301,6 +326,19 @@ function getUsersWithoutCurrent() {
         }
     }
     return otherUsers;
+}
+
+function getUserFromCurrentChatByUUID(UUID) {
+    var user;
+    for (var i = 0; i < arrayUsers.length; i++) {
+        if (arrayUsers[i].userUUID == UUID) {
+            user = arrayUsers[i];
+        }
+    }
+    if (user == null) {
+        user = new createUserObject('', '', '');
+    }
+    return user;
 }
 
 function setOutput() {
@@ -477,18 +515,23 @@ function writeMessageToScreen(message, beggining) {
         informationAboutMessagesInChat.numbersMessagesInChat++;
     }
     else if (sendingMessage != null && message.isFromServer()) {
-        sendingMessage.id = sendingMessage.id + "_" + message.getMessageID();
         if (sendingMessage.classList.contains("SendingMessage")) {
             sendingMessage.classList.remove("SendingMessage");
         }
-        if (sendingMessage.classList.contains("ExceptionMessage")) {
-            sendingMessage.classList.remove("ExceptionMessage");
+        if(message.isExceptionWhenSending() && !sendingMessage.classList.contains("ExceptionMessage")){
+            sendingMessage.classList.add("ExceptionMessage");
         }
-        if (informationAboutMessagesInChat.minDateInChat > message.getDateMessage()) {
-            informationAboutMessagesInChat.minDateInChat = message.getDateMessage();
+        else {
+            sendingMessage.id = sendingMessage.id + "_" + message.getMessageID();
+            if (sendingMessage.classList.contains("ExceptionMessage")) {
+                sendingMessage.classList.remove("ExceptionMessage");
+            }
+            if (informationAboutMessagesInChat.minDateInChat > message.getDateMessage()) {
+                informationAboutMessagesInChat.minDateInChat = message.getDateMessage();
+            }
+            informationAboutMessagesInChat.numbersMessagesInChat++;
+            message.removeFromLocalStorage();
         }
-        informationAboutMessagesInChat.numbersMessagesInChat++;
-        message.removeFromLocalStorage();
     }
 }
 
@@ -550,7 +593,7 @@ function functionChangingChatByID(idChat) {
             "type": "bigChat",
             "operation": "gettingChatID",
             "userFrom": cookieValue,
-            "chatID": idChat
+            "chatID": parseInt(idChat, 10)
         }
     );
     doSend(json);
@@ -738,10 +781,10 @@ function functionOnScrollChat(div) {
         var json = JSON.stringify({
                 "type": "MoreMessages",
                 "operation": "gettingMoreMessageinChat",
-                "chatID": output.id.substring(output.id.indexOf("_") + 1, output.id.length),
+                "chatID": parseInt(output.id.substring(output.id.indexOf("_") + 1, output.id.length), 10),
                 "userFrom": cookieValue,
                 "numberMessagesAlreadyInChat": informationAboutMessagesInChat.numbersMessagesInChat,
-                "minDateInChat": informationAboutMessagesInChat.minDateInChat,
+                "minDateInChat": informationAboutMessagesInChat.minDateInChat.getTime(),
                 "howMuchWeNeed": informationAboutMessagesInChat.howMuchMessagesWeNeedAfterScroll
             }
         );

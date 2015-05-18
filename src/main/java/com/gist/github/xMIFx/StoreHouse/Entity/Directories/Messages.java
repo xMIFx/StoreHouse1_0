@@ -10,6 +10,7 @@ import java.util.*;
  * Created by bukatinvv on 16.04.2015.
  */
 public class Messages {
+
     private class UsersTo {
         private User userTo;
         private boolean itNewMessage;
@@ -73,7 +74,7 @@ public class Messages {
     private List<User> usersWhichDontRead; //For Web. every time new
     private String UUIDFromBrowser;
     private final String type = "Messages"; //for json
-
+    private boolean exceptionWhenSending = false;
     public Messages() {
     }
 
@@ -155,6 +156,14 @@ public class Messages {
 
     public void setMarkForDelete(boolean markForDelete) {
         this.markForDelete = markForDelete;
+    }
+
+    public boolean isExceptionWhenSending() {
+        return exceptionWhenSending;
+    }
+
+    public void setExceptionWhenSending(boolean exceptionWhenSending) {
+        this.exceptionWhenSending = exceptionWhenSending;
     }
 
     public String getUUIDFromBrowser() {
