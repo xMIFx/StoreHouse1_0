@@ -172,11 +172,15 @@ div.loading {
     position: absolute;
 }
 
-div.MessageClass div.loading {
+div.MessageClass div.loading, div.ResendDelete {
      display: none;
 }
 
 div.MessageClass.SendingMessage div.loading {
+    display: block;
+}
+
+div.MessageClass.ExceptionMessage div.ResendDelete{
     display: block;
 }
 

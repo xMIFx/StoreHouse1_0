@@ -546,7 +546,7 @@ public class ChatDaoJdbc implements ChatDao {
                      "and mes.userUUID = '" + userUUID + "'\n" +
                      "UNION ALL\n" +
                      "Select\n" +
-                     "m.idChat\n" +
+                     "m.id\n" +
                      "from\n" +
                      "storehouse.messages m\n" +
                      "where m.UserFrom = '" + userUUID + "'\n" +

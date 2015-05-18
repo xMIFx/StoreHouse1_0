@@ -124,6 +124,14 @@
             </div>
         </div>
     </div>
+    <div class = "ResendDelete">
+        <div class="Resend">
+
+        </div>
+        <div class="ForDelete">
+
+        </div>
+    </div>
     <p class="WhoWright"></p>
     <p class="WhoDontRead"></p>
     <p class="MessageText"></p>
