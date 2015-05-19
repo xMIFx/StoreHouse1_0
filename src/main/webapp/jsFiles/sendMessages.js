@@ -17,13 +17,14 @@ var wsUri = "ws://" + document.location.host + document.location.pathname + "/ch
 var dataLocalStorage = {
     set: function (key, value) {
         if (!key || !value) {
-            return;
+             return;
         }
 
         if (typeof value === "object") {
             value = JSON.stringify(value);
         }
         localStorage.setItem(key, value);
+
     },
     get: function (key) {
         var value = localStorage.getItem(key);
@@ -59,7 +60,6 @@ websocket.onerror = function (evt) {
 };
 
 function closeIt() {
-    alert('Close');
     websocket.close();
 }
 
@@ -177,13 +177,17 @@ function createMessageObject(chatID, UUIDFromBrowser, userFrom, newMessage, date
     this.getDateMessageInTime = function () {
         return this.dateMessageInTime;
     }
+    this.isExceptionWhenSending = function () {
+        return this.exceptionWhenSending;
+    }
+
     this.addToLocalStorage = function () {
         var chatItem = createChatObjectFromLocalStorage(dataLocalStorage.get("chat_" + this.getChatID()));
         if (chatItem == null) {
-            chatItem = new createChatObject("chat_" + this.getChatID())
+            chatItem = new createChatObject(this.getChatID())
         }
         chatItem.addMessage(this);
-        dataLocalStorage.set(chatItem.chatID, chatItem);
+        dataLocalStorage.set("chat_"+chatItem.chatID, chatItem);
     }
     this.removeFromLocalStorage = function () {
         var chatItem = createChatObjectFromLocalStorage(dataLocalStorage.get("chat_" + this.getChatID()));
@@ -192,13 +196,11 @@ function createMessageObject(chatID, UUIDFromBrowser, userFrom, newMessage, date
                 dataLocalStorage.remove(chatItem.getID());
             }
             else {
-                dataLocalStorage.set(chatItem.getID(), chatItem);
+                dataLocalStorage.set("chat_"+chatItem.getID(), chatItem);
             }
         }
     }
-    this.isExceptionWhenSending = function () {
-        return this.exceptionWhenSending;
-    }
+
 
     //ToJSON
     this.toJSON = function (key) {
