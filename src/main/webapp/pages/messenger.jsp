@@ -67,7 +67,6 @@
     </div>
     <div id="output_box" class="output_box" onload="initOutput()">
         <div class="chat_box" id="usersChat_0"  onscroll="functionOnScrollChat(this)">
-
         </div>
         <div style="text-align: center;">
             <form action="">
